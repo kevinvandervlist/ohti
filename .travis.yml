@@ -1,0 +1,14 @@
+language: scala
+jdk:
+  - openjdk8
+  - openjdk11
+scala:
+  - 2.13.1
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION test
+notifications:
+  email:
+    recipients:
+      - travis@kevinvandervlist.nl
+    on_success: never # default: change
+    on_failure: always # default: always
