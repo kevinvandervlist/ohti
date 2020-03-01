@@ -1,0 +1,6 @@
+.idea/*
+.project/*
+project/project/*
+target/*
+main/src/main/resources/application.conf
+*/target/*
