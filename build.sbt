@@ -14,6 +14,7 @@ lazy val commonSettings = Seq(
     "-unchecked"
   ),
   libraryDependencies ++= Seq(
+    "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
     "org.scalatest" %% "scalatest" % "3.1.1" % "test"
   )
 )
@@ -23,6 +24,10 @@ lazy val api = (project in file("api")).
   settings(
     name := "api",
     libraryDependencies ++= Seq(
+      "io.reactivex.rxjava3" % "rxjava" % "3.0.0",
+      "com.softwaremill.sttp.client" %% "core" % "2.0.1",
+      "com.softwaremill.sttp.client" %% "circe" % "2.0.1",
+      "io.circe" %% "circe-optics" % "0.13.0"
     ),
   )
 
@@ -32,7 +37,6 @@ lazy val main = (project in file("main")).
     name := "main",
     libraryDependencies ++= Seq(
       "ch.qos.logback" % "logback-classic" % "1.2.3",
-      "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
       "com.typesafe" % "config" % "1.4.0",
     ),
   ).dependsOn(api)

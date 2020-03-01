@@ -14,10 +14,5 @@ object Config {
 
 trait Settings {
   def username: String
-  /** Itho uses a hexademical encoding for the password when sending it to the login endpoint */
-  def encodedUsername: String = username
-    .toList
-    .map(_.toInt.toHexString)
-    .mkString
   def password: String
 }
