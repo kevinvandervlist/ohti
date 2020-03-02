@@ -9,7 +9,7 @@ import sttp.client.circe._
 
 object TokenManager {
   case class TokenResponse(access_token: String, token_type: String, expires_in: Int, refresh_token: String)
-  type TokenProvider = () => TokenResponse
+  type TokenProvider = () => Option[TokenResponse]
 
   implicit val decodeTokenResponse: Decoder[TokenResponse] = new Decoder[TokenResponse] {
     final def apply(c: HCursor): Decoder.Result[TokenResponse] =

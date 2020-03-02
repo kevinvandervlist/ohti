@@ -1,13 +1,13 @@
 package nl.kevinvandervlist.othi.api
 
 import nl.kevinvandervlist.othi.api.model.EnergyDevice
-import nl.kevinvandervlist.othi.portal.TokenManager.TokenResponse
+import nl.kevinvandervlist.othi.portal.TokenManager.{TokenProvider, TokenResponse}
 
 import scala.concurrent.Future
 import java.util.concurrent.{ScheduledExecutorService, _}
 
 import com.typesafe.scalalogging.LazyLogging
-import nl.kevinvandervlist.othi.portal.TokenManager
+import nl.kevinvandervlist.othi.portal.{EnergyDevices, TokenManager}
 import sttp.client.{Identity, NothingT, SttpBackend}
 
 private[api] class AsyncPortalAPI(username: String, password: String)
@@ -27,7 +27,14 @@ private[api] class AsyncPortalAPI(username: String, password: String)
       throw new IllegalStateException(msg)
   }
 
-  override def energyDevices: Future[List[EnergyDevice]] = ???
+  private implicit val tokenProvider: TokenProvider = () => bearer
+
+  // Portal features
+  private val energyDevicesFeature = new EnergyDevices()
+
+  override def energyDevices: Future[List[EnergyDevice]] = {
+    ???
+  }
 
   private def refresh: Callable[Unit] = new Callable[Unit] {
     override def call(): Unit = {

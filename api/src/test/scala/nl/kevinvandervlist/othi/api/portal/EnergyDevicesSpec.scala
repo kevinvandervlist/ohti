@@ -20,7 +20,6 @@ class EnergyDevicesSpec extends AnyWordSpec with Matchers {
       |  {"type":200,"scheduleId":null,"properties":[{"scheduleChoices":[{"label":"Aan","value":"1","disabled":false,"moments":null,"overrideUntil":0},{"label":"Uit","value":"0","disabled":false,"moments":null,"overrideUntil":0}],"label":"Powerplug","type":"choiceproperty","typeCustom":"choiceproperty-smartplugstatus","statusModified":false,"id":"SmartPlugStatus","status":null,"canControl":true,"hasLogging":false,"hasSchedule":true,"hasStatus":false,"isAvailable":null,"statusLastUpdated":null}],"parameters":null,"currentUsage":456.7,"historicUsage":null,"id":"45fba720-c04a-4b6c-a471-e9a5d5c0d3c9","name":"Some other sensor","serialNumber":"01234567","model":"niko","energyType":10,"isOnline":true,"isCentralMeter":false,"isDinRail":true,"isLiveUsageEnabled":true,"isProducer":true,"isSwitch":true,"isSwitchable":true,"isSwitchedOn":true,"meterIndexCurrentValue":null,"meterIndexTimestamp":null,"meterIndexValue":null,"bdrSetting":0}
       |]""".stripMargin
 
-  implicit val tokenProvider: TokenProvider = () => TokenResponse("access", "type", 10, "refresh")
 
   implicit val testingBackend = SttpBackendStub.synchronous
       .whenRequestMatchesPartial {
@@ -28,12 +27,17 @@ class EnergyDevicesSpec extends AnyWordSpec with Matchers {
       }
 
   "Energy devices" should {
-    val devices = new EnergyDevices()
-
-    "be retrieved" in {
-      val energyDevices = devices.retrieveDevices()
+    "be retrieved when a token is present" in {
+      implicit val tokenProvider: TokenProvider = () => Some(TokenResponse("access", "type", 10, "refresh"))
+      val energyDevices = new EnergyDevices().retrieveDevices()
       energyDevices.isDefined shouldBe true
       energyDevices.get.size shouldBe 7
+    }
+    "not be retrieved without a token" in {
+      implicit val tokenProvider: TokenProvider = () => None
+      assertThrows[IllegalStateException] {
+        new EnergyDevices().retrieveDevices()
+      }
     }
   }
 }
