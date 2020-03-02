@@ -5,7 +5,7 @@ import java.util.UUID
 
 import com.typesafe.scalalogging.LazyLogging
 import io.circe.{Decoder, HCursor}
-import nl.kevinvandervlist.othi.api.model.{ElectricityLowTariff, ElectricityNormalTariff, EnergyDevice, EnergyType, Gas}
+import nl.kevinvandervlist.othi.api.model.{ElectricityLowTariff, ElectricityNormalTariff, EnergyDevice, EnergyType, Gas, IthoZonedDateTime}
 import nl.kevinvandervlist.othi.portal.EnergyDevices._
 import nl.kevinvandervlist.othi.portal.TokenManager._
 import sttp.client._
@@ -22,7 +22,7 @@ object EnergyDevices {
         et <- c.downField("energyType").as[Int]
       } yield {
         // Note: I _think_ we are always in CET here
-        val zdt = ots.map(ts => ZonedDateTime.parse(s"$ts+01:00"))
+        val zdt = ots.map(IthoZonedDateTime.fromPortalString)
         val v = if(value.isNaN) { None } else { Some(BigDecimal(value)) }
         EnergyDevice(UUID.fromString(id), name, v, zdt, asEnergyType(et))
       }

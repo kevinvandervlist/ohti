@@ -1,13 +1,15 @@
 package nl.kevinvandervlist.othi.api
 
-import nl.kevinvandervlist.othi.api.model.EnergyDevice
+import java.util.UUID
+
+import nl.kevinvandervlist.othi.api.model.{EnergyDevice, IthoZonedDateTime, MonitoringData}
 import nl.kevinvandervlist.othi.portal.TokenManager.{TokenProvider, TokenResponse}
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 import java.util.concurrent.{ScheduledExecutorService, _}
 
 import com.typesafe.scalalogging.LazyLogging
-import nl.kevinvandervlist.othi.portal.{EnergyDevices, TokenManager}
+import nl.kevinvandervlist.othi.portal.{EnergyDevices, Monitoring, TokenManager}
 import sttp.client.{Identity, NothingT, SttpBackend}
 
 private[api] class AsyncPortalAPI(username: String, password: String)
@@ -32,6 +34,7 @@ private[api] class AsyncPortalAPI(username: String, password: String)
 
   // Portal features
   private val energyDevicesFeature = new EnergyDevices()
+  private val monitoringFeature = new Monitoring()
 
   override def energyDevices: Future[List[EnergyDevice]] = Future {
     energyDevicesFeature.retrieveDevices() match {
@@ -40,6 +43,17 @@ private[api] class AsyncPortalAPI(username: String, password: String)
       case None =>
         logger.warn("Retrieving energy devices was successful, but no valid response found")
         List.empty
+    }
+  }
+
+  override def monitoringData(interval: Int, uuid: UUID, measurementCount: Int, start: IthoZonedDateTime): Future[MonitoringData] = Future {
+    monitoringFeature.retrieveMonitoringData(interval, uuid, measurementCount, start) match {
+      case Some(data) =>
+        data
+      case None =>
+        val msg = "Retrieving monitoring data was successful, but no valid response found"
+        logger.warn(msg)
+        throw new NoSuchElementException(msg)
     }
   }
 
