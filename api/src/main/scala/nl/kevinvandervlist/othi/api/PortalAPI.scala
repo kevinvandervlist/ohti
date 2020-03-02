@@ -1,11 +1,16 @@
 package nl.kevinvandervlist.othi.api
 
+import java.util.concurrent.{Executors, ScheduledExecutorService}
+
 import nl.kevinvandervlist.othi.api.model.EnergyDevice
+import sttp.client.HttpURLConnectionBackend
 
 import scala.concurrent.Future
 
 object PortalAPI {
-  def apply(): PortalAPI = new AsyncPortalAPI()
+  private implicit val pool: ScheduledExecutorService = Executors.newScheduledThreadPool(2)
+  private implicit val backend = HttpURLConnectionBackend()
+  def apply(username: String, password: String): PortalAPI = new AsyncPortalAPI(username, password)
 }
 
 /**
