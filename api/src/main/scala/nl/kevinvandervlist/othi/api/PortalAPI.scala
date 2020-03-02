@@ -8,7 +8,7 @@ import sttp.client.HttpURLConnectionBackend
 import scala.concurrent.Future
 
 object PortalAPI {
-  private implicit val pool: ScheduledExecutorService = Executors.newScheduledThreadPool(2)
+  private implicit val pool: ScheduledExecutorService = Executors.newScheduledThreadPool(4)
   private implicit val backend = HttpURLConnectionBackend()
   def apply(username: String, password: String): PortalAPI = new AsyncPortalAPI(username, password)
 }

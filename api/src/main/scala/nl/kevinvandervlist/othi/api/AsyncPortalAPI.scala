@@ -3,7 +3,7 @@ package nl.kevinvandervlist.othi.api
 import nl.kevinvandervlist.othi.api.model.EnergyDevice
 import nl.kevinvandervlist.othi.portal.TokenManager.{TokenProvider, TokenResponse}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 import java.util.concurrent.{ScheduledExecutorService, _}
 
 import com.typesafe.scalalogging.LazyLogging
@@ -28,12 +28,19 @@ private[api] class AsyncPortalAPI(username: String, password: String)
   }
 
   private implicit val tokenProvider: TokenProvider = () => bearer
+  private implicit val executor: ExecutionContextExecutor = ExecutionContext.fromExecutor(pool)
 
   // Portal features
   private val energyDevicesFeature = new EnergyDevices()
 
-  override def energyDevices: Future[List[EnergyDevice]] = {
-    ???
+  override def energyDevices: Future[List[EnergyDevice]] = Future {
+    energyDevicesFeature.retrieveDevices() match {
+      case Some(devices) =>
+        devices
+      case None =>
+        logger.warn("Retrieving energy devices was successful, but no valid response found")
+        List.empty
+    }
   }
 
   private def refresh: Callable[Unit] = new Callable[Unit] {
