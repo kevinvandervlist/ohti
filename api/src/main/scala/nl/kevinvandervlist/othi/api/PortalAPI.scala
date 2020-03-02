@@ -3,22 +3,30 @@ package nl.kevinvandervlist.othi.api
 import java.util.UUID
 import java.util.concurrent.{Executors, ScheduledExecutorService}
 
+import sttp.client.logging.slf4j._
 import nl.kevinvandervlist.othi.api.model.{EnergyDevice, IthoZonedDateTime, MonitoringData}
-import sttp.client.HttpURLConnectionBackend
+import sttp.client.{HttpURLConnectionBackend, Identity, NothingT, SttpBackend}
 
 import scala.concurrent.Future
 
 object PortalAPI {
-  private implicit val pool: ScheduledExecutorService = Executors.newScheduledThreadPool(4)
-  private implicit val backend = HttpURLConnectionBackend()
-  def apply(username: String, password: String): PortalAPI = new AsyncPortalAPI(username, password)
+  def apply(username: String, password: String, debug: Boolean = false): PortalAPI = {
+    implicit val pool: ScheduledExecutorService = Executors.newScheduledThreadPool(8)
+    implicit val backend: SttpBackend[Identity, Nothing, NothingT] = HttpURLConnectionBackend()
+
+    if(debug) {
+      new AsyncPortalAPI(username, password)(pool, Slf4jCurlBackend[Identity, Nothing, NothingT](backend))
+    } else {
+      new AsyncPortalAPI(username, password)
+    }
+  }
 }
 
 /**
  * An opinionated, high level API wrapping the Mijn Itho Daalderop portal
  */
 trait PortalAPI {
-  def energyDevices: Future[List[EnergyDevice]]
+  def energyDevices(): Future[List[EnergyDevice]]
   def monitoringData(interval: Int, uuid: UUID, measurementCount: Int, start: IthoZonedDateTime): Future[MonitoringData]
   /** Stop this portal API instance (destructor) */
   def stop(): Unit = ()

@@ -22,6 +22,8 @@ object Monitoring {
     }
   }
 
+  case class HackMixedDoubleAndStrings(s: String)
+
   implicit val decodeMonitoringData: Decoder[MonitoringData] = new Decoder[MonitoringData] {
     final def apply(c: HCursor): Decoder.Result[MonitoringData] = {
       val arr = c.downArray
@@ -30,13 +32,20 @@ object Monitoring {
         unit <- arr.downField("dataUnit").as[DataUnit]
         start <- arr.downField("dateStart").as[Long]
         ts <- arr.downField("timeStamp").as[Long]
-        data <- arr.downField("data").as[List[Double]]
+        //data <- arr.downField("data").as[List[String]]
+        data <- arr.downField("data").as[List[HackMixedDoubleAndStrings]](Decoder.decodeList(dataDecoder))
       } yield {
-        def bd(d: Double): Option[BigDecimal] = if(d.isNaN) { None } else { Some(BigDecimal(d)) }
+        //def bd(d: Double): Option[BigDecimal] = if(d.isNaN) { None } else { Some(BigDecimal(d)) }
+        def bd(d: HackMixedDoubleAndStrings): Option[BigDecimal] = if(d.s == "NaN") { None } else { Some(BigDecimal(d.s)) }
         MonitoringData(UUID.fromString(id), unit, IthoZonedDateTime.fromTimeStamp(start), IthoZonedDateTime.fromTimeStamp(ts), data.map(bd))
       }
     }
   }
+
+  implicit val dataDecoder: Decoder[HackMixedDoubleAndStrings] =
+    Decoder.instance(_.as[String]).or(
+      Decoder.instance(_.as[Double].map(_.toString))
+    ).map(HackMixedDoubleAndStrings.apply)
 }
 
 

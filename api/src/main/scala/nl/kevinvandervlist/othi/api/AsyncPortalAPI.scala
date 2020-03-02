@@ -38,7 +38,7 @@ private[api] class AsyncPortalAPI(username: String, password: String)
   private val energyDevicesFeature = new EnergyDevices()
   private val monitoringFeature = new Monitoring()
 
-  override def energyDevices: Future[List[EnergyDevice]] = Future {
+  override def energyDevices(): Future[List[EnergyDevice]] = Future {
     energyDevicesFeature.retrieveDevices() match {
       case Some(devices) =>
         devices
@@ -61,8 +61,11 @@ private[api] class AsyncPortalAPI(username: String, password: String)
 
   override def stop(): Unit = try {
     scheduledRefresh.map(_.cancel(true))
+    pool.shutdown()
+    logger.info("Stopping pool...")
   } catch {
-    case _: Exception =>
+    case e: Exception =>
+      logger.error("Failed to stop: {}", e)
   }
 
   private def registerRefresh(tr: TokenResponse): Unit = {

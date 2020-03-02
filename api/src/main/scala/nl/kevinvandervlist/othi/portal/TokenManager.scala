@@ -67,7 +67,14 @@ class TokenManager(private implicit val backend: SttpBackend[Identity, Nothing, 
 
   private def handleResponse(method: String, response: Identity[Response[Either[ResponseError[circe.Error], TokenResponse]]]): Option[TokenResponse] = {
     if(response.code.isSuccess) {
-      Some(response.body.asInstanceOf[TokenResponse])
+      // TODO: this behaves differently under test & runtime...
+      if(response.body.isInstanceOf[TokenResponse]) {
+        // This is required for test
+        Some(response.body.asInstanceOf[TokenResponse])
+      } else {
+        // but this happens in production
+        response.body.toOption
+      }
     } else {
       logger.error("{} failed; got status {} - {}", method, response.code, response.body.toString)
       None

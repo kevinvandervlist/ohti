@@ -9,7 +9,7 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.13.1",
   scalacOptions ++= Seq(
     "-feature",
-    "-Xfatal-warnings",
+    // "-Xfatal-warnings", disabled for now
     "-deprecation",
     "-unchecked"
   ),
@@ -27,6 +27,7 @@ lazy val api = (project in file("api")).
       "io.reactivex.rxjava3" % "rxjava" % "3.0.0",
       "com.softwaremill.sttp.client" %% "core" % "2.0.1",
       "com.softwaremill.sttp.client" %% "circe" % "2.0.1",
+      "com.softwaremill.sttp.client" %% "slf4j-backend" % "2.0.1",
       "io.circe" %% "circe-optics" % "0.13.0"
     ),
   )

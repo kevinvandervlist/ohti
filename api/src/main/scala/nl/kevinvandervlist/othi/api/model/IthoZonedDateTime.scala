@@ -4,6 +4,8 @@ import java.time.format.DateTimeFormatter
 import java.time.{Instant, ZoneId, ZonedDateTime}
 
 object IthoZonedDateTime {
+  def today: IthoZonedDateTime = fromTimeStamp(System.currentTimeMillis())
+
   def fromPortalString(dateTime: String): IthoZonedDateTime = {
     val zdt = ZonedDateTime.parse(s"$dateTime+01:00[Europe/Amsterdam]")
     IthoZonedDateTime(zdt)

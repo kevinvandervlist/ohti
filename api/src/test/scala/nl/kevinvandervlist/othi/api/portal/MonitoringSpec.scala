@@ -22,7 +22,7 @@ class MonitoringSpec extends AnyWordSpec with Matchers {
       |    "dateStart":1583054800000,
       |    "dataGrouping":1440,
       |    "dataLength":2,
-      |    "data":[100.0,23.0],
+      |    "data":[100.0,23.0,"NaN"],
       |    "totalEnergy":{"normal":123.0,"low":45.0},
       |    "timeStamp":1583056800000,
       |    "eTag":"\"0xDEADBEEFDEADBEE\"",
