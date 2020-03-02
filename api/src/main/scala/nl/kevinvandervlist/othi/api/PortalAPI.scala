@@ -20,6 +20,8 @@ object PortalAPI {
 trait PortalAPI {
   def energyDevices: Future[List[EnergyDevice]]
   def monitoringData(interval: Int, uuid: UUID, measurementCount: Int, start: IthoZonedDateTime): Future[MonitoringData]
+  /** Stop this portal API instance (destructor) */
+  def stop(): Unit = ()
 
   /**
    * Retrieve daily data for a given device and moment (will automatically start at the beginning of the day).

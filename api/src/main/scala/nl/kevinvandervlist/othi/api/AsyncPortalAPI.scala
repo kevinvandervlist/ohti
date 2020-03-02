@@ -29,6 +29,8 @@ private[api] class AsyncPortalAPI(username: String, password: String)
       throw new IllegalStateException(msg)
   }
 
+  var scheduledRefresh: Option[ScheduledFuture[Unit]] = None
+
   private implicit val tokenProvider: TokenProvider = () => bearer
   private implicit val executor: ExecutionContextExecutor = ExecutionContext.fromExecutor(pool)
 
@@ -57,23 +59,29 @@ private[api] class AsyncPortalAPI(username: String, password: String)
     }
   }
 
-  private def refresh: Callable[Unit] = new Callable[Unit] {
-    override def call(): Unit = {
-      bearer.flatMap(tokenManager.refreshToken) match {
-        case bt @ Some(updated) =>
-          bearer = bt
-          registerRefresh(updated)
-          logger.debug(s"Refreshed bearer token for $username successfully")
-        case None =>
-          logger.error("Refreshing bearer token failed; no new token received")
-      }
-    }
+  override def stop(): Unit = try {
+    scheduledRefresh.map(_.cancel(true))
+  } catch {
+    case _: Exception =>
   }
 
   private def registerRefresh(tr: TokenResponse): Unit = {
+    def refresh: Callable[Unit] = new Callable[Unit] {
+      override def call(): Unit = {
+        bearer.flatMap(tokenManager.refreshToken) match {
+          case bt @ Some(updated) =>
+            bearer = bt
+            registerRefresh(updated)
+            logger.debug(s"Refreshed bearer token for $username successfully")
+          case None =>
+            logger.error("Refreshing bearer token failed; no new token received")
+        }
+      }
+    }
+
     // Refresh the token when it is 95% away from expiring.
     val refreshAt = (tr.expires_in * 0.95).toLong
     logger.debug(s"Registering bearer token refresh call in $refreshAt seconds")
-    pool.schedule(refresh, refreshAt, TimeUnit.SECONDS)
+    scheduledRefresh = Some(pool.schedule(refresh, refreshAt, TimeUnit.SECONDS))
   }
 }
