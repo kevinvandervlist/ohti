@@ -1,0 +1,24 @@
+#!/bin/bash -e
+
+cd "$(dirname "$0")"/../
+
+./script/test
+
+SBT_ARGS=""
+TARGET_DIR="target"
+
+if [ "${TRAVIS}" = true ]; then
+    echo "Running in travis mode"
+    SBT_ARGS="++$TRAVIS_SCALA_VERSION"
+fi
+
+sbt ${SBT_ARGS} compile assembly 'show assembly'
+
+cp main/target/scala-2.13/main-assembly-0.0.1-SNAPSHOT.jar ${TARGET_DIR}/othi.jar
+cp main/src/main/resources/reference.conf ${TARGET_DIR}/application.conf
+cp main/src/main/resources/logback.xml ${TARGET_DIR}/logback.xml
+
+echo "Fat jar can be fonud at ${TARGET_DIR}"
+
+# cd target
+# java -Dconfig.file=application.conf -Dlogback.configurationFile=./logback.xml -jar othi.jar

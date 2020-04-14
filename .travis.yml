@@ -4,8 +4,10 @@ jdk:
   - openjdk11
 scala:
   - 2.13.1
+before_script:
+  - script/bootstrap
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION test
+  - script/cibuild
 notifications:
   email:
     recipients:

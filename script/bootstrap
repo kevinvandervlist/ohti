@@ -1,0 +1,20 @@
+#!/bin/bash -e
+
+cd "$(dirname "$0")"/../
+
+function check_dependency() {
+    if ! [ -x "$(command -v $1)" ]; then
+       echo "Missing dependency ${1}, please install:"
+       if [ "$(uname)" == "Darwin" ]; then
+          echo -e "\tbrew install $2" >&2
+       elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+          echo -e "\tapt-get update && apt-get install $2" >&2
+       else
+          echo -e "\t${2}"
+       fi
+    fi
+}
+
+check_dependency "sbt" "sbt"
+
+sbt update

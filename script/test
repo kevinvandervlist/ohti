@@ -1,0 +1,12 @@
+#!/bin/bash -e
+
+cd "$(dirname "$0")"/../
+
+SBT_ARGS=""
+
+if [ "${TRAVIS}" = true ]; then
+    echo "Running in travis mode"
+    SBT_ARGS="++$TRAVIS_SCALA_VERSION"
+fi
+
+sbt ${SBT_ARGS} test
