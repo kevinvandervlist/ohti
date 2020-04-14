@@ -1,7 +1,5 @@
 javacOptions ++= Seq("-source", "1.11", "-target", "1.11", "-Xlint")
 
-enablePlugins(PackPlugin)
-
 lazy val commonSettings = Seq(
   organization := "nl.kevinvandervlist",
   name := "othi",
@@ -16,7 +14,9 @@ lazy val commonSettings = Seq(
   libraryDependencies ++= Seq(
     "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
     "org.scalatest" %% "scalatest" % "3.1.1" % "test"
-  )
+  ),
+  // Skip tests in assembly
+  test in assembly := {},
 )
 
 lazy val api = (project in file("api")).
@@ -30,6 +30,8 @@ lazy val api = (project in file("api")).
       "com.softwaremill.sttp.client" %% "slf4j-backend" % "2.0.1",
       "io.circe" %% "circe-optics" % "0.13.0"
     ),
+  ).settings(
+    assemblyJarName in assembly := "api.jar",
   )
 
 lazy val main = (project in file("main")).
@@ -40,4 +42,6 @@ lazy val main = (project in file("main")).
       "ch.qos.logback" % "logback-classic" % "1.2.3",
       "com.typesafe" % "config" % "1.4.0",
     ),
-  ).dependsOn(api)
+  ).settings(
+    mainClass in assembly := Some(" nl.kevinvandervlist.othi.main.Main"),
+) .dependsOn(api)
