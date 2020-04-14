@@ -4,7 +4,7 @@ enablePlugins(PackPlugin)
 
 lazy val commonSettings = Seq(
   organization := "nl.kevinvandervlist",
-  name := "othi-viewer",
+  name := "othi",
   version := "0.0.1-SNAPSHOT",
   scalaVersion := "2.13.1",
   scalacOptions ++= Seq(
@@ -41,24 +41,3 @@ lazy val main = (project in file("main")).
       "com.typesafe" % "config" % "1.4.0",
     ),
   ).dependsOn(api)
-
-packMain := Map(
-  // "foo" -> "classpath"
-)
-
-packJvmOpts := Map(
-  // "foo" -> Seq("-Xmx512m")
-)
-
-packExtraClasspath := Map(
-  // "foo" -> Seq(s"${PROG_HOME}/etc")
-)
-
-// Add a root project that explicitly depends on / aggregates _all_ modules
-// See http://www.scala-sbt.org/1.0/docs/Multi-Project.html#Default+root+project for why
-// lazy val minoa = Project(
-//   id = "minoa",
-//   base = file(".")
-// ).enablePlugins(PackPlugin)
-//   .dependsOn(api, main)
-//   .aggregate(api, main)
