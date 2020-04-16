@@ -1,4 +1,4 @@
-package nl.kevinvandervlist.othi.api.model
+package nl.kevinvandervlist.ohti.api.model
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

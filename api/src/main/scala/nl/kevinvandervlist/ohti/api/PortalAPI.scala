@@ -1,21 +1,23 @@
-package nl.kevinvandervlist.othi.api
+package nl.kevinvandervlist.ohti.api
 
 import java.util.UUID
 import java.util.concurrent.{Executors, ScheduledExecutorService}
 
 import sttp.client.logging.slf4j._
-import nl.kevinvandervlist.othi.api.model.{EnergyDevice, IthoZonedDateTime, MonitoringData}
+import nl.kevinvandervlist.ohti.api.model.{EnergyDevice, IthoZonedDateTime, MonitoringData}
+import nl.kevinvandervlist.ohti.portal.Endpoint
 import sttp.client.{HttpURLConnectionBackend, Identity, NothingT, SttpBackend}
 
 import scala.concurrent.Future
 
 object PortalAPI {
-  def apply(username: String, password: String, debug: Boolean = false): PortalAPI = {
+  def apply(baseURL: String, username: String, password: String, debug: Boolean = false): PortalAPI = {
+    implicit val endpoint: Endpoint = Endpoint(baseURL)
     implicit val pool: ScheduledExecutorService = Executors.newScheduledThreadPool(8)
     implicit val backend: SttpBackend[Identity, Nothing, NothingT] = HttpURLConnectionBackend()
 
     if(debug) {
-      new AsyncPortalAPI(username, password)(pool, Slf4jCurlBackend[Identity, Nothing, NothingT](backend))
+      new AsyncPortalAPI(username, password)(endpoint, pool, Slf4jCurlBackend[Identity, Nothing, NothingT](backend))
     } else {
       new AsyncPortalAPI(username, password)
     }

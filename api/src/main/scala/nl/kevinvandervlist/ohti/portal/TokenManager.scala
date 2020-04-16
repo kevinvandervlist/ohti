@@ -1,9 +1,9 @@
-package nl.kevinvandervlist.othi.portal
+package nl.kevinvandervlist.ohti.portal
 
 import com.typesafe.scalalogging.LazyLogging
 import io.circe
 import io.circe.{Decoder, Encoder, HCursor, Json}
-import nl.kevinvandervlist.othi.portal.TokenManager._
+import nl.kevinvandervlist.ohti.portal.TokenManager._
 import sttp.client._
 import sttp.client.circe._
 
@@ -33,8 +33,8 @@ object TokenManager {
   }
 }
 
-class TokenManager(private implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends LazyLogging {
-  private val uri = uri"https://mijn.ithodaalderop.nl/api/tokens"
+class TokenManager(private implicit val endpoint: Endpoint,
+                   private implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends LazyLogging {
 
   def refreshToken(previous: TokenResponse): Option[TokenResponse] = {
     val request = Util.baseRequest
@@ -42,7 +42,7 @@ class TokenManager(private implicit val backend: SttpBackend[Identity, Nothing, 
         "refresh_token" -> previous.refresh_token,
         "grant_type" -> "refresh_token"
       ))
-      .post(uri)
+      .post(endpoint.tokens)
 
     handleResponse("refreshToken", request
       .response(asJson[TokenResponse])
@@ -57,7 +57,7 @@ class TokenManager(private implicit val backend: SttpBackend[Identity, Nothing, 
         "password" -> pass,
         "grant_type" -> "password"
       ))
-      .post(uri)
+      .post(endpoint.tokens)
 
     handleResponse("requestToken", request
       .response(asJson[TokenResponse])

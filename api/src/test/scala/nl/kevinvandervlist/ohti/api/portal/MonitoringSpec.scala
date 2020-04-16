@@ -1,10 +1,10 @@
-package nl.kevinvandervlist.othi.api.portal
+package nl.kevinvandervlist.ohti.api.portal
 
 import java.util.UUID
 
-import nl.kevinvandervlist.othi.api.model.IthoZonedDateTime
-import nl.kevinvandervlist.othi.portal.Monitoring
-import nl.kevinvandervlist.othi.portal.TokenManager._
+import nl.kevinvandervlist.ohti.api.model.IthoZonedDateTime
+import nl.kevinvandervlist.ohti.portal.{Endpoint, Monitoring}
+import nl.kevinvandervlist.ohti.portal.TokenManager._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import sttp.client.Response
@@ -30,6 +30,7 @@ class MonitoringSpec extends AnyWordSpec with Matchers {
       |  }
       |]""".stripMargin
 
+  private implicit val endpoint: Endpoint = Endpoint("https://test.example.com")
   implicit val testingBackend = SttpBackendStub.synchronous
       .whenRequestMatchesPartial {
         case r if r.method == Method.GET => Response.ok(response)

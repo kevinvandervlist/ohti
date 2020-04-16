@@ -1,19 +1,20 @@
-package nl.kevinvandervlist.othi.api
+package nl.kevinvandervlist.ohti.api
 
 import java.util.UUID
 
-import nl.kevinvandervlist.othi.api.model.{EnergyDevice, IthoZonedDateTime, MonitoringData}
-import nl.kevinvandervlist.othi.portal.TokenManager.{TokenProvider, TokenResponse}
+import nl.kevinvandervlist.ohti.api.model.{EnergyDevice, IthoZonedDateTime, MonitoringData}
+import nl.kevinvandervlist.ohti.portal.TokenManager.{TokenProvider, TokenResponse}
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 import java.util.concurrent.{ScheduledExecutorService, _}
 
 import com.typesafe.scalalogging.LazyLogging
-import nl.kevinvandervlist.othi.portal.{EnergyDevices, Monitoring, TokenManager}
+import nl.kevinvandervlist.ohti.portal.{Endpoint, EnergyDevices, Monitoring, TokenManager}
 import sttp.client.{Identity, NothingT, SttpBackend}
 
 private[api] class AsyncPortalAPI(username: String, password: String)
-                                 (implicit val pool: ScheduledExecutorService,
+                                 (implicit val endpoint: Endpoint,
+                                  implicit val pool: ScheduledExecutorService,
                                   implicit val backend: SttpBackend[Identity, Nothing, NothingT]
                                  ) extends PortalAPI with LazyLogging {
   private val tokenManager = new TokenManager()
@@ -61,6 +62,12 @@ private[api] class AsyncPortalAPI(username: String, password: String)
 
   override def stop(): Unit = try {
     scheduledRefresh.map(_.cancel(true))
+    // A hack required to make sure delayed tasks are not executed after shutdown.
+    pool match {
+      // https://bugs.java.com/bugdatabase/view_bug.do?bug_id=7069418
+      case e: ScheduledThreadPoolExecutor => e.setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+      case _ => //
+    }
     pool.shutdown()
     logger.info("Stopping pool...")
   } catch {

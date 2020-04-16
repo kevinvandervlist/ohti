@@ -1,17 +1,18 @@
-package nl.kevinvandervlist.othi.api.portal
+package nl.kevinvandervlist.ohti.api.portal
 
-import nl.kevinvandervlist.othi.portal.TokenManager
+import nl.kevinvandervlist.ohti.portal.{Endpoint, TokenManager}
 import org.scalatest.wordspec.AnyWordSpec
 import sttp.client.Response
 import sttp.client.testing.SttpBackendStub
 import sttp.model.{Method, StatusCode}
-import nl.kevinvandervlist.othi.portal.TokenManager._
+import nl.kevinvandervlist.ohti.portal.TokenManager._
 import org.scalatest.matchers.should.Matchers
 
 class TokenManagerSpec extends AnyWordSpec with Matchers {
   private val initial = TokenResponse("access_1", "type", 100, "refresh_1")
   private val refreshed = TokenResponse("access_2", "type", 100, "refresh_2")
 
+  private implicit val endpoint: Endpoint = Endpoint("https://test.example.com")
   implicit val testingBackend = SttpBackendStub.synchronous
       .whenRequestMatchesPartial {
         case r if r.method == Method.POST && r.uri.path.startsWith(List("api", "tokens")) =>

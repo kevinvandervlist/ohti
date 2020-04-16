@@ -2,7 +2,7 @@ javacOptions ++= Seq("-source", "1.11", "-target", "1.11", "-Xlint")
 
 lazy val commonSettings = Seq(
   organization := "nl.kevinvandervlist",
-  name := "othi",
+  name := "ohti",
   version := "0.0.1-SNAPSHOT",
   scalaVersion := "2.13.1",
   scalacOptions ++= Seq(
@@ -43,5 +43,5 @@ lazy val main = (project in file("main")).
       "com.typesafe" % "config" % "1.4.0",
     ),
   ).settings(
-    mainClass in assembly := Some(" nl.kevinvandervlist.othi.main.Main"),
+    mainClass in assembly := Some(" nl.kevinvandervlist.ohti.main.Main"),
 ) .dependsOn(api)

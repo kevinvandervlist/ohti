@@ -1,4 +1,4 @@
-package nl.kevinvandervlist.othi.api.model
+package nl.kevinvandervlist.ohti.api.model
 
 import java.time.ZonedDateTime
 import java.util.UUID

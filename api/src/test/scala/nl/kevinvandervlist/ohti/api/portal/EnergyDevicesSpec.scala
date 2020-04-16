@@ -1,7 +1,7 @@
-package nl.kevinvandervlist.othi.api.portal
+package nl.kevinvandervlist.ohti.api.portal
 
-import nl.kevinvandervlist.othi.portal.EnergyDevices
-import nl.kevinvandervlist.othi.portal.TokenManager._
+import nl.kevinvandervlist.ohti.portal.{Endpoint, EnergyDevices}
+import nl.kevinvandervlist.ohti.portal.TokenManager._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import sttp.client.Response
@@ -20,7 +20,7 @@ class EnergyDevicesSpec extends AnyWordSpec with Matchers {
       |  {"type":200,"scheduleId":null,"properties":[{"scheduleChoices":[{"label":"Aan","value":"1","disabled":false,"moments":null,"overrideUntil":0},{"label":"Uit","value":"0","disabled":false,"moments":null,"overrideUntil":0}],"label":"Powerplug","type":"choiceproperty","typeCustom":"choiceproperty-smartplugstatus","statusModified":false,"id":"SmartPlugStatus","status":null,"canControl":true,"hasLogging":false,"hasSchedule":true,"hasStatus":false,"isAvailable":null,"statusLastUpdated":null}],"parameters":null,"currentUsage":456.7,"historicUsage":null,"id":"45fba720-c04a-4b6c-a471-e9a5d5c0d3c9","name":"Some other sensor","serialNumber":"01234567","model":"niko","energyType":10,"isOnline":true,"isCentralMeter":false,"isDinRail":true,"isLiveUsageEnabled":true,"isProducer":true,"isSwitch":true,"isSwitchable":true,"isSwitchedOn":true,"meterIndexCurrentValue":null,"meterIndexTimestamp":null,"meterIndexValue":null,"bdrSetting":0}
       |]""".stripMargin
 
-
+  private implicit val endpoint: Endpoint = Endpoint("https://test.example.com")
   implicit val testingBackend = SttpBackendStub.synchronous
       .whenRequestMatchesPartial {
         case r if r.method == Method.GET => Response.ok(devices)

@@ -1,9 +1,9 @@
-package nl.kevinvandervlist.othi.main
+package nl.kevinvandervlist.ohti.main
 
 import com.typesafe.scalalogging.LazyLogging
-import nl.kevinvandervlist.othi.api.PortalAPI
-import nl.kevinvandervlist.othi.api.model.{IthoZonedDateTime, MonitoringData}
-import nl.kevinvandervlist.othi.config.Config
+import nl.kevinvandervlist.ohti.config.Config
+import nl.kevinvandervlist.ohti.api.PortalAPI
+import nl.kevinvandervlist.ohti.api.model.{IthoZonedDateTime, MonitoringData}
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -13,8 +13,8 @@ import scala.util.Success
 
 object Main extends App with LazyLogging {
   val cfg = Config()
-  logger.info(s"Starting othi-viewer for username ${cfg.username}...")
-  val portal = PortalAPI(cfg.username, cfg.password, debug = true)
+  logger.info(s"Starting ohti for username ${cfg.username}...")
+  val portal = PortalAPI(cfg.url, cfg.username, cfg.password, debug = true)
 
   val result: Future[List[MonitoringData]] = portal.energyDevices().map(eds => {
     val today = IthoZonedDateTime.today

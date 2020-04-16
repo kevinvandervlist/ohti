@@ -1,13 +1,12 @@
-package nl.kevinvandervlist.othi.portal
+package nl.kevinvandervlist.ohti.portal
 
-import java.time.ZonedDateTime
 import java.util.UUID
 
 import com.typesafe.scalalogging.LazyLogging
 import io.circe.{Decoder, HCursor}
-import nl.kevinvandervlist.othi.api.model.{ElectricityLowTariff, ElectricityNormalTariff, EnergyDevice, EnergyType, Gas, IthoZonedDateTime}
-import nl.kevinvandervlist.othi.portal.EnergyDevices._
-import nl.kevinvandervlist.othi.portal.TokenManager._
+import nl.kevinvandervlist.ohti.api.model.{ElectricityLowTariff, ElectricityNormalTariff, EnergyDevice, EnergyType, Gas, IthoZonedDateTime}
+import nl.kevinvandervlist.ohti.portal.EnergyDevices._
+import nl.kevinvandervlist.ohti.portal.TokenManager._
 import sttp.client._
 import sttp.client.circe._
 
@@ -36,23 +35,18 @@ object EnergyDevices {
   }
 }
 
-class EnergyDevices(private implicit val tokenProvider: TokenProvider,
-                    private implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends LazyLogging {
-  private val uri = uri"https://mijn.ithodaalderop.nl/api/devices/energy/energyDevices"
+class EnergyDevices(private implicit val endpoint: Endpoint,
+                    private implicit val tokenProvider: TokenProvider,
+                    private implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends ResponseHandler[List[EnergyDevice]] {
 
   def retrieveDevices(): Option[List[EnergyDevice]] = {
     val request = Util.authorizedRequest(tokenProvider)
-      .get(uri)
+      .get(endpoint.energyDevices)
 
     val response = request
       .response(asJson[List[EnergyDevice]])
       .send()
 
-    if(response.code.isSuccess) {
-      response.body.toOption
-    } else {
-      logger.error("Failed to retrieve devices, got code {} - {}", response.code, response.body.toString)
-      None
-    }
+    handle("Failed to retrieve devices, got code {} - {}", response)
   }
 }

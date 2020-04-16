@@ -1,12 +1,12 @@
-package nl.kevinvandervlist.othi.portal
+package nl.kevinvandervlist.ohti.portal
 
 import java.util.UUID
 
 import com.typesafe.scalalogging.LazyLogging
 import io.circe.{Decoder, HCursor}
-import nl.kevinvandervlist.othi.api.model.{CubicMeter, DataUnit, IthoZonedDateTime, MonitoringData, Watthour}
-import nl.kevinvandervlist.othi.portal.TokenManager._
-import nl.kevinvandervlist.othi.portal.Monitoring._
+import nl.kevinvandervlist.ohti.api.model.{CubicMeter, DataUnit, IthoZonedDateTime, MonitoringData, Watthour}
+import nl.kevinvandervlist.ohti.portal.TokenManager._
+import nl.kevinvandervlist.ohti.portal.Monitoring._
 import sttp.client._
 import sttp.client.circe._
 
@@ -49,25 +49,18 @@ object Monitoring {
 }
 
 
-class Monitoring(private implicit val tokenProvider: TokenProvider,
-                    private implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends LazyLogging {
-  private def uri(interval: Int, uuid: UUID, measurementCount: Int, start: IthoZonedDateTime) = {
-    uri"https://mijn.ithodaalderop.nl/api/monitoring/$interval/devices/${uuid.toString}/?take=$measurementCount&start=${start.asTimeStamp}"
-  }
+class Monitoring(private implicit val endpoint: Endpoint,
+                 private implicit val tokenProvider: TokenProvider,
+                 private implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends ResponseHandler[MonitoringData] {
 
   def retrieveMonitoringData(interval: Int, uuid: UUID, measurementCount: Int, start: IthoZonedDateTime): Option[MonitoringData] = {
     val request = Util.authorizedRequest(tokenProvider)
-      .get(uri(interval, uuid, measurementCount, start))
+      .get(endpoint.monitoring(interval, uuid.toString, measurementCount, start.asTimeStamp))
 
     val response = request
       .response(asJson[MonitoringData])
       .send()
 
-    if(response.code.isSuccess) {
-      response.body.toOption
-    } else {
-      logger.error("Failed to retrieve devices, got code {} - {}", response.code, response.body.toString)
-      None
-    }
+    handle("Failed to retrieve devices, got code {} - {}", response)
   }
 }

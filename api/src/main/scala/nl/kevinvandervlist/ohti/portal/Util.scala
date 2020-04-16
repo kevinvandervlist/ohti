@@ -1,13 +1,13 @@
-package nl.kevinvandervlist.othi.portal
+package nl.kevinvandervlist.ohti.portal
 
 import com.typesafe.scalalogging.LazyLogging
-import nl.kevinvandervlist.othi.portal.TokenManager.{TokenProvider, TokenResponse}
+import nl.kevinvandervlist.ohti.portal.TokenManager.{TokenProvider, TokenResponse}
 import sttp.client.{Empty, RequestT, basicRequest}
 
 object Util extends LazyLogging {
   def baseRequest: RequestT[Empty, Either[String, String], Nothing] = basicRequest
     .header("User-Agent", Util.UserAgent)
-  val UserAgent: String = "othi-viewer API"
+  val UserAgent: String = "ohti API"
 
   def authorizedRequest(provider: TokenProvider): RequestT[Empty, Either[String, String], Nothing] = {
     provider() match {
