@@ -37,7 +37,7 @@ object EnergyDevices {
 
 class EnergyDevices(private implicit val endpoint: Endpoint,
                     private implicit val tokenProvider: TokenProvider,
-                    private implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends ResponseHandler[List[EnergyDevice]] {
+                    protected implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends Client[List[EnergyDevice]] {
 
   def retrieveDevices(): Option[List[EnergyDevice]] = {
     val request = Util.authorizedRequest(tokenProvider)
@@ -45,8 +45,7 @@ class EnergyDevices(private implicit val endpoint: Endpoint,
 
     val response = request
       .response(asJson[List[EnergyDevice]])
-      .send()
 
-    handle("Failed to retrieve devices, got code {} - {}", response)
+    doRequest("Failed to retrieve devices, got code {} - {}", request, response)
   }
 }

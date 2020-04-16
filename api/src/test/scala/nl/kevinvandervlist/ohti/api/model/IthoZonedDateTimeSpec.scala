@@ -6,7 +6,7 @@ import org.scalatest.wordspec.AnyWordSpec
 class IthoZonedDateTimeSpec extends AnyWordSpec with Matchers {
   "Date and time data" should {
     "be symmetrical in case of string" in {
-      val input = "2020-03-01T11:00:00"
+      val input = "2020-03-16T11:00:00"
       val izdt = IthoZonedDateTime.fromPortalString(input)
       izdt.asPortalString shouldBe input
     }
