@@ -56,9 +56,9 @@ object TodaysNetUsage extends App with LazyLogging {
   println(asJSON(infos))
 
   private def asJSON(infos: List[UsageInfo]): String = {
-    s"""var usage = [
+    s"""[
        |  ${infos.map(asJSON).mkString(",")}
-       |];
+       |]
        |""".stripMargin
   }
 
@@ -66,17 +66,17 @@ object TodaysNetUsage extends App with LazyLogging {
     s"""{
        |  "name": "${info.name}",
        |  "gas": {
-       |    "m3": ${info.gas},
+       |    "m3": ${info.gas}
        |  },
        |  "electricity": {
-       |    "total_kwh": "${info.totalUsage}",
-       |    "percentage_own_power": "${info.ownProductionConsumptionPercentage}",
-       |    "total_production_kwh": "${info.produced}",
-       |    "own_production_usage_kwh": "${info.directlyConsumedProduction}",
-       |    "own_production_usage_percentage": "${info.directlyConsumedProductionPercentage}",
-       |    "net_feedback_kwh": "${info.credit}",
-       |    "net_usage_kwh": "${info.consumed}",
-       |    "current_net_usage_ratio": "${info.compensated_net_usage}",
+       |    "total_kwh": ${info.totalUsage},
+       |    "percentage_own_power": ${info.ownProductionConsumptionPercentage},
+       |    "total_production_kwh": ${info.produced},
+       |    "own_production_usage_kwh": ${info.directlyConsumedProduction},
+       |    "own_production_usage_percentage": ${info.directlyConsumedProductionPercentage},
+       |    "net_feedback_kwh": ${info.credit},
+       |    "net_usage_kwh": ${info.consumed},
+       |    "current_net_usage_ratio": ${info.compensated_net_usage}
        |  }
        |}
        |""".stripMargin
