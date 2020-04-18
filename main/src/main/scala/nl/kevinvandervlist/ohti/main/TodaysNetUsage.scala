@@ -1,6 +1,8 @@
 package nl.kevinvandervlist.ohti.main
 
-import java.util.UUID
+import java.io.{File, PrintWriter}
+import java.time.LocalDate
+import java.util.{Date, UUID}
 
 import com.typesafe.scalalogging.LazyLogging
 import nl.kevinvandervlist.ohti.api.PortalAPI
@@ -18,15 +20,9 @@ object TodaysNetUsage extends App with LazyLogging {
   logger.info(s"Starting ohti for username ${cfg.username}...")
   val portal = PortalAPI(cfg.url, cfg.username, cfg.password, debug = true)
 
-  val cases: Map[String, UUID => Future[MonitoringData]] = Map(
-    "Contract" -> (portal.retrieveYearlyData(_, IthoZonedDateTime.fromPortalString("2019-11-20T11:00:00"))),
-    "Year" -> (portal.retrieveYearlyData(_, IthoZonedDateTime.fromPortalString("2019-04-17T11:00:00"))),
-    "Quarter" -> (portal.retrieveQuarterlyData(_, IthoZonedDateTime.fromPortalString("2020-01-17T11:00:00"))),
-    "Month" -> (portal.retrieveMonthlyData(_, IthoZonedDateTime.fromPortalString("2020-03-17T11:00:00"))),
-    "Week" -> (portal.retrieveWeeklyData(_, IthoZonedDateTime.fromPortalString("2020-04-10T11:00:00"))),
-    "Yesterday" -> (portal.retrieveDailyData(_, IthoZonedDateTime.fromPortalString("2020-04-16T11:00:00"))),
-  )
-
+  // These are manually defined
+  val startOfYear = IthoZonedDateTime.fromPortalString("2020-01-01T11:00:00")
+  val contractDate = IthoZonedDateTime.fromPortalString("2019-11-20T11:00:00")
   val devices: Devices = Devices(
     gas = List(
     ),
@@ -38,7 +34,28 @@ object TodaysNetUsage extends App with LazyLogging {
     )
   )
 
-  val infos = Await.result(new RetrieveTotal(cases, devices).fetch(), 7500 millis)
+  // The rest is derived automatically
+  val oneDayAgo = IthoZonedDateTime.fromLocalDate(LocalDate.now.minusDays(1))
+  val twoDaysAgo = IthoZonedDateTime.fromLocalDate(LocalDate.now.minusDays(2))
+  val threeDaysAgo = IthoZonedDateTime.fromLocalDate(LocalDate.now.minusDays(3))
+  val week = IthoZonedDateTime.fromLocalDate(LocalDate.now.minusDays(7))
+  val month = IthoZonedDateTime.fromLocalDate(LocalDate.now.minusMonths(1))
+  val quartile = IthoZonedDateTime.fromLocalDate(LocalDate.now.minusMonths(3))
+  val year = IthoZonedDateTime.fromLocalDate(LocalDate.now.minusYears(1))
+
+  val cases: Map[String, UUID => Future[MonitoringData]] = Map(
+    "YTD" -> (portal.retrieveYearlyData(_, startOfYear)),
+    "Contract" -> (portal.retrieveYearlyData(_, contractDate)),
+    "Year" -> (portal.retrieveYearlyData(_, year)),
+    "Quartile" -> (portal.retrieveQuarterlyData(_, quartile)),
+    "Month" -> (portal.retrieveMonthlyData(_, month)),
+    "Week" -> (portal.retrieveWeeklyData(_, week)),
+    "Yesterday" -> (portal.retrieveDailyData(_, oneDayAgo)),
+    "TwoDaysAgo" -> (portal.retrieveDailyData(_, twoDaysAgo)),
+    "ThreeDaysAgo" -> (portal.retrieveDailyData(_, threeDaysAgo)),
+  )
+
+  val infos = Await.result(new RetrieveTotal(cases, devices).fetch(), 10000 millis)
 
   portal.stop()
 
@@ -53,7 +70,12 @@ object TodaysNetUsage extends App with LazyLogging {
     println(s"- Stand salderen: ${info.compensated_net_usage} kWh")
   }
 
-  println(asJSON(infos))
+  val info = asJSON(infos)
+  logger.info(info)
+
+  val target = new File("data.json")
+  logger.info(s"Writing data to ${target.getCanonicalPath}")
+  dumpToFile(target, info)
 
   private def asJSON(infos: List[UsageInfo]): String = {
     s"""[
@@ -80,6 +102,15 @@ object TodaysNetUsage extends App with LazyLogging {
        |  }
        |}
        |""".stripMargin
+  }
+
+  def dumpToFile(target: File, content: String): Unit = {
+    val writer: PrintWriter = new PrintWriter(target)
+    try {
+      writer.write(content)
+    } finally {
+      writer.close()
+    }
   }
 }
 

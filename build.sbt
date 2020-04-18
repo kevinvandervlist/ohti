@@ -43,5 +43,5 @@ lazy val main = (project in file("main")).
       "com.typesafe" % "config" % "1.4.0",
     ),
   ).settings(
-    mainClass in assembly := Some(" nl.kevinvandervlist.ohti.main.Main"),
+    mainClass in assembly := Some("nl.kevinvandervlist.ohti.main.TodaysNetUsage"),
 ) .dependsOn(api)
