@@ -1,7 +1,8 @@
 package nl.kevinvandervlist.ohti.api.model
 
 import java.time.format.DateTimeFormatter
-import java.time.{Instant, ZoneId, ZonedDateTime}
+import java.time.{Instant, LocalDate, ZoneId, ZonedDateTime}
+import java.util.Date
 
 object IthoZonedDateTime {
   def today: IthoZonedDateTime = fromTimeStamp(System.currentTimeMillis())
@@ -15,6 +16,17 @@ object IthoZonedDateTime {
     val zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ts), ZoneId.of("Europe/Amsterdam"))
     IthoZonedDateTime(zdt)
   }
+
+  def fromDate(dt: Date): IthoZonedDateTime =
+    fromTimeStamp(dt.getTime)
+
+  def fromLocalDate(ld: LocalDate): IthoZonedDateTime =
+    fromDate(Date.from(
+      ld.atStartOfDay()
+        .atZone(ZoneId.systemDefault())
+        .toInstant
+      )
+    )
 }
 
 case class IthoZonedDateTime(private val zonedDateTime: ZonedDateTime) {
