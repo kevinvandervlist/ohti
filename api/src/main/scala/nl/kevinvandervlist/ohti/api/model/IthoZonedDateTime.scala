@@ -1,7 +1,8 @@
 package nl.kevinvandervlist.ohti.api.model
 
 import java.time.format.DateTimeFormatter
-import java.time.{Instant, LocalDate, ZoneId, ZonedDateTime}
+import java.time.temporal.ChronoUnit
+import java.time.{Instant, LocalDate, LocalTime, ZoneId, ZonedDateTime}
 import java.util.Date
 
 object IthoZonedDateTime {
@@ -35,5 +36,19 @@ case class IthoZonedDateTime(private val zonedDateTime: ZonedDateTime) {
   def daysInMonth: Int = zonedDateTime.getMonth.length(zonedDateTime.toLocalDate.isLeapYear)
 
   // Why is this so complicate you ask? https://stackoverflow.com/a/29145886
-  def startOfDay: IthoZonedDateTime = IthoZonedDateTime(zonedDateTime.toLocalDate.atStartOfDay().atZone(zonedDateTime.getZone).withLaterOffsetAtOverlap())
+  def startOfDay: IthoZonedDateTime =
+    IthoZonedDateTime(zonedDateTime
+      .toLocalDate
+      .atStartOfDay()
+      .atZone(zonedDateTime.getZone)
+      .withLaterOffsetAtOverlap()
+    )
+
+  def endOfDay: IthoZonedDateTime =
+    IthoZonedDateTime(zonedDateTime
+      .`with`(LocalTime.of(23, 59, 59))
+    )
+
+  def between(other: IthoZonedDateTime, unit: ChronoUnit): Long =
+   unit.between(zonedDateTime, other.zonedDateTime)
 }

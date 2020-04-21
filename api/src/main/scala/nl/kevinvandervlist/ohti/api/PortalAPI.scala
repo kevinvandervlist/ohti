@@ -1,5 +1,6 @@
 package nl.kevinvandervlist.ohti.api
 
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 import java.util.concurrent.{Executors, ScheduledExecutorService}
 
@@ -66,4 +67,15 @@ trait PortalAPI {
    */
   def retrieveYearlyData(uuid: UUID, start: IthoZonedDateTime): Future[MonitoringData] =
     monitoringData(10080, uuid, 52, start.startOfDay)
+
+  /**
+   * Retrieve yearly data for a given device and moment (will automatically start at the beginning of the day).
+   * This is equivalent to the web portal 'year' option.
+   */
+  def retrieveYearlyData(uuid: UUID, _start: IthoZonedDateTime, _end: IthoZonedDateTime): Future[MonitoringData] = {
+    val start = _start.startOfDay
+    val end = _end.endOfDay
+    val measurementCount: Int = start.between(end, ChronoUnit.WEEKS).toInt
+    monitoringData(10080, uuid, measurementCount, start)
+  }
 }

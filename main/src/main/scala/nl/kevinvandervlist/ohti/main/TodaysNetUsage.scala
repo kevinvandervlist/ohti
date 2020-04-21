@@ -2,7 +2,7 @@ package nl.kevinvandervlist.ohti.main
 
 import java.io.{File, PrintWriter}
 import java.time.LocalDate
-import java.util.{Date, UUID}
+import java.util.UUID
 
 import com.typesafe.scalalogging.LazyLogging
 import nl.kevinvandervlist.ohti.api.PortalAPI
@@ -21,7 +21,7 @@ object TodaysNetUsage extends App with LazyLogging {
   val portal = PortalAPI(cfg.url, cfg.username, cfg.password, debug = cfg.debug)
 
   // These are manually defined
-  val startOfYear = IthoZonedDateTime.fromPortalString("2020-01-01T11:00:00")
+  val moveInDate = IthoZonedDateTime.fromPortalString("2017-12-08T11:00:00")
   val contractDate = IthoZonedDateTime.fromPortalString("2019-11-20T11:00:00")
   val devices: Devices = Devices(
     gas = List(
@@ -35,6 +35,8 @@ object TodaysNetUsage extends App with LazyLogging {
   )
 
   // The rest is derived automatically
+  val startOfYear = IthoZonedDateTime.fromPortalString(s"${LocalDate.now().getYear}-01-01T11:00:00")
+  val today = IthoZonedDateTime.fromLocalDate(LocalDate.now())
   val oneDayAgo = IthoZonedDateTime.fromLocalDate(LocalDate.now.minusDays(1))
   val twoDaysAgo = IthoZonedDateTime.fromLocalDate(LocalDate.now.minusDays(2))
   val threeDaysAgo = IthoZonedDateTime.fromLocalDate(LocalDate.now.minusDays(3))
@@ -44,6 +46,7 @@ object TodaysNetUsage extends App with LazyLogging {
   val year = IthoZonedDateTime.fromLocalDate(LocalDate.now.minusYears(1))
 
   val cases: Map[String, UUID => Future[MonitoringData]] = Map(
+    "Move-in" -> (portal.retrieveYearlyData(_, moveInDate, today)),
     "YTD" -> (portal.retrieveYearlyData(_, startOfYear)),
     "Contract" -> (portal.retrieveYearlyData(_, contractDate)),
     "Year" -> (portal.retrieveYearlyData(_, year)),
@@ -55,7 +58,8 @@ object TodaysNetUsage extends App with LazyLogging {
     "ThreeDaysAgo" -> (portal.retrieveDailyData(_, threeDaysAgo)),
   )
 
-  val infos = Await.result(new RetrieveTotal(cases, devices).fetch(), 10000 millis)
+  val maxDuration = 30000 millis
+  val infos = Await.result(new RetrieveTotal(cases, devices).fetch(), maxDuration)
 
   portal.stop()
 

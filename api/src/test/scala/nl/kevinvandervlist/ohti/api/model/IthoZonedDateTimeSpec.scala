@@ -1,6 +1,7 @@
 package nl.kevinvandervlist.ohti.api.model
 
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.Date
 
 import org.scalatest.matchers.should.Matchers
@@ -25,17 +26,28 @@ class IthoZonedDateTimeSpec extends AnyWordSpec with Matchers {
       izdt.startOfDay shouldBe IthoZonedDateTime.fromPortalString("2020-02-29T00:00:00")
     }
 
+    "retrieve the end of a given day" in {
+      val izdt = IthoZonedDateTime.fromPortalString("2020-02-29T11:32:00")
+      izdt.endOfDay shouldBe IthoZonedDateTime.fromPortalString("2020-02-29T23:59:59")
+    }
+
     "be mapped from a date object" in {
-      val dt = new Date()
-      val idt = IthoZonedDateTime.fromDate(dt)
-      idt.startOfDay.asPortalString shouldBe s"${dt.getYear + 1900}-${String.format("%02d", dt.getMonth + 1)}-${dt.getDate}T00:00:00"
+      val now = LocalDate.now()
+      val idt = IthoZonedDateTime.fromDate(new Date())
+      idt.startOfDay.asPortalString shouldBe s"${now.getYear}-${String.format("%02d", now.getMonth.getValue)}-${now.getDayOfMonth}T00:00:00"
     }
 
     "be mapped from a local date object" in {
       val yesterday = LocalDate.now
-      val dt = new Date()
       val idt = IthoZonedDateTime.fromLocalDate(yesterday)
-      idt.startOfDay.asPortalString shouldBe s"${dt.getYear + 1900}-${String.format("%02d", dt.getMonth + 1)}-${dt.getDate}T00:00:00"
+      idt.startOfDay.asPortalString shouldBe s"${yesterday.getYear}-${String.format("%02d", yesterday.getMonth.getValue)}-${yesterday.getDayOfMonth}T00:00:00"
+    }
+
+    "calculate right delta between two zdts" in {
+      val a = IthoZonedDateTime.fromPortalString("2019-03-16T11:00:00")
+      val b = IthoZonedDateTime.fromPortalString("2020-04-01T11:00:00")
+      a.between(b, ChronoUnit.WEEKS) shouldBe 54
+      a.between(b, ChronoUnit.DAYS) shouldBe 382
     }
   }
 }
