@@ -12,13 +12,13 @@ if [ "${TRAVIS}" = true ]; then
     SBT_ARGS="++$TRAVIS_SCALA_VERSION"
 fi
 
-sbt ${SBT_ARGS} compile assembly 'show assembly'
+sbt ${SBT_ARGS} clean compile assembly 'show assembly'
 
-cp main/target/scala-2.13/main-assembly-0.0.1-SNAPSHOT.jar ${TARGET_DIR}/othi.jar
+cp main/target/scala-2.13/main-assembly-0.0.1-SNAPSHOT.jar ${TARGET_DIR}/ohti.jar
 cp main/src/main/resources/reference.conf ${TARGET_DIR}/application.conf
 cp main/src/main/resources/logback.xml ${TARGET_DIR}/logback.xml
 
-echo "Fat jar can be fonud at ${TARGET_DIR}"
+echo "Fat jar can be found at ${TARGET_DIR}"
 
 # cd target
 # java -Dconfig.file=application.conf -Dlogback.configurationFile=./logback.xml -jar othi.jar
