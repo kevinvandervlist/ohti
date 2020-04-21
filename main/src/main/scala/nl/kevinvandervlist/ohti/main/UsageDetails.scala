@@ -7,30 +7,34 @@ import java.util.UUID
 import com.typesafe.scalalogging.LazyLogging
 import nl.kevinvandervlist.ohti.api.PortalAPI
 import nl.kevinvandervlist.ohti.api.model.{IthoZonedDateTime, MonitoringData}
+import nl.kevinvandervlist.ohti.config.Settings
 import nl.kevinvandervlist.ohti.usage.{Devices, RetrieveTotal, UsageInfo}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
+import scala.jdk.CollectionConverters._
 
 object UsageDetails extends RunnableTask with LazyLogging {
   override def name: String = "usage-details"
 
-  // These are manually defined
-  private val moveInDate = IthoZonedDateTime.fromPortalString("2017-12-08T11:00:00")
-  private val contractDate = IthoZonedDateTime.fromPortalString("2019-11-20T11:00:00")
-  private val devices: Devices = Devices(
-    gas = List(
-    ),
-    consumed = List(
-    ),
-    produced = List(
-    ),
-    feedback = List(
-    )
-  )
+  override def apply(api: PortalAPI, settings: Settings)(implicit ec: ExecutionContext): Unit = {
+    val cfg = settings.taskConfig(name)
 
-  override def apply(api: PortalAPI)(implicit ec: ExecutionContext): Unit = {
+    def uuidList(sl: java.util.List[String]): List[UUID] = sl.asScala
+      .toList
+      .map(UUID.fromString)
+
+    val devices: Devices = Devices(
+      gas = uuidList(cfg.getStringList("gas")),
+      consumed = uuidList(cfg.getStringList("consumed")),
+      produced = uuidList(cfg.getStringList("produced")),
+      feedback = uuidList(cfg.getStringList("feedback"))
+    )
+
+    val moveInDate = IthoZonedDateTime.fromPortalString(cfg.getString("move-in-date"))
+    val contractDate = IthoZonedDateTime.fromPortalString(cfg.getString("contract-date"))
+
     val startOfYear = IthoZonedDateTime.fromPortalString(s"${LocalDate.now().getYear}-01-01T11:00:00")
     val today = IthoZonedDateTime.fromLocalDate(LocalDate.now())
     val oneDayAgo = IthoZonedDateTime.fromLocalDate(LocalDate.now.minusDays(1))

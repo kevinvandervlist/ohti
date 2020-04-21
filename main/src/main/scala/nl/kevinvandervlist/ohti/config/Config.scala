@@ -1,6 +1,6 @@
 package nl.kevinvandervlist.ohti.config
 
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 
 object Config {
   def apply(): Settings = {
@@ -10,6 +10,7 @@ object Config {
       override def username: String = conf.getString("username")
       override def password: String = conf.getString("password")
       override def debug: Boolean = conf.getBoolean("debug")
+      override def taskConfig(task: String): Config = conf.getConfig(task)
     }
   }
 }
@@ -19,4 +20,5 @@ trait Settings {
   def username: String
   def password: String
   def debug: Boolean
+  def taskConfig(task: String): com.typesafe.config.Config
 }

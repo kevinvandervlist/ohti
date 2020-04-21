@@ -32,10 +32,9 @@ object Main extends App with LazyLogging {
     val cfg = Config()
     logger.info(s"Starting ohti for username ${cfg.username}...")
     val portal = PortalAPI(cfg.url, cfg.username, cfg.password, debug = cfg.debug)
-
     for(task <- queue) {
       logger.info("Executing task {}", task.name)
-      task.apply(portal)
+      task.apply(portal, cfg)
       logger.info("Completed task {}", task.name)
     }
 
