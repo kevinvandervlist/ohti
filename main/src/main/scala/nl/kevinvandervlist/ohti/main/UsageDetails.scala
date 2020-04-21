@@ -8,29 +8,19 @@ import com.typesafe.scalalogging.LazyLogging
 import nl.kevinvandervlist.ohti.api.PortalAPI
 import nl.kevinvandervlist.ohti.api.model.{IthoZonedDateTime, MonitoringData}
 import nl.kevinvandervlist.ohti.config.Settings
+import nl.kevinvandervlist.ohti.main.DailyAggregateSQLite.devices
 import nl.kevinvandervlist.ohti.usage.{Devices, RetrieveTotal, UsageInfo}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
-import scala.jdk.CollectionConverters._
 
 object UsageDetails extends RunnableTask with LazyLogging {
   override def name: String = "usage-details"
 
   override def apply(api: PortalAPI, settings: Settings)(implicit ec: ExecutionContext): Unit = {
     val cfg = settings.taskConfig(name)
-
-    def uuidList(sl: java.util.List[String]): List[UUID] = sl.asScala
-      .toList
-      .map(UUID.fromString)
-
-    val devices: Devices = Devices(
-      gas = uuidList(cfg.getStringList("gas")),
-      consumed = uuidList(cfg.getStringList("consumed")),
-      produced = uuidList(cfg.getStringList("produced")),
-      feedback = uuidList(cfg.getStringList("feedback"))
-    )
+    val devs: Devices = devices(cfg)
 
     val moveInDate = IthoZonedDateTime.fromPortalString(cfg.getString("move-in-date"))
     val contractDate = IthoZonedDateTime.fromPortalString(cfg.getString("contract-date"))
@@ -59,7 +49,7 @@ object UsageDetails extends RunnableTask with LazyLogging {
     )
 
     val maxDuration = 30000 millis
-    val infos = Await.result(new RetrieveTotal(cases, devices).fetch(), maxDuration)
+    val infos = Await.result(new RetrieveTotal(cases, devs).fetch(), maxDuration)
 
     for(info <- infos) {
       logger.info(info.name)
