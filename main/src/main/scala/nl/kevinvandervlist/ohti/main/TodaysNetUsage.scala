@@ -18,7 +18,7 @@ import scala.language.postfixOps
 object TodaysNetUsage extends App with LazyLogging {
   val cfg = Config()
   logger.info(s"Starting ohti for username ${cfg.username}...")
-  val portal = PortalAPI(cfg.url, cfg.username, cfg.password, debug = true)
+  val portal = PortalAPI(cfg.url, cfg.username, cfg.password, debug = cfg.debug)
 
   // These are manually defined
   val startOfYear = IthoZonedDateTime.fromPortalString("2020-01-01T11:00:00")

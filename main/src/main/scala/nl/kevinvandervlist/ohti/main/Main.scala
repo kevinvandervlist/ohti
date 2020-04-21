@@ -14,7 +14,7 @@ import scala.util.Success
 object Main extends App with LazyLogging {
   val cfg = Config()
   logger.info(s"Starting ohti for username ${cfg.username}...")
-  val portal = PortalAPI(cfg.url, cfg.username, cfg.password, debug = true)
+  val portal = PortalAPI(cfg.url, cfg.username, cfg.password, debug = cfg.debug)
 
   val result: Future[List[MonitoringData]] = portal.energyDevices().map(eds => {
     val today = IthoZonedDateTime.today

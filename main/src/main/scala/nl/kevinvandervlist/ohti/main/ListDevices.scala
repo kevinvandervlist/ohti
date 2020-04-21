@@ -11,7 +11,7 @@ import scala.language.postfixOps
 object ListDevices extends App with LazyLogging {
   val cfg = Config()
   logger.info(s"Starting ohti for username ${cfg.username}...")
-  val portal = PortalAPI(cfg.url, cfg.username, cfg.password, debug = true)
+  val portal = PortalAPI(cfg.url, cfg.username, cfg.password, debug = cfg.debug)
 
   val devices = Await.result(portal.energyDevices(), 5000 millis)
   println("Your devices are:")

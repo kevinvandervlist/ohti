@@ -9,6 +9,7 @@ object Config {
       override def url: String = conf.getString("url")
       override def username: String = conf.getString("username")
       override def password: String = conf.getString("password")
+      override def debug: Boolean = conf.getBoolean("debug")
     }
   }
 }
@@ -17,4 +18,5 @@ trait Settings {
   def url: String
   def username: String
   def password: String
+  def debug: Boolean
 }
