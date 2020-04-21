@@ -1,34 +1,51 @@
 package nl.kevinvandervlist.ohti.main
 
 import com.typesafe.scalalogging.LazyLogging
-import nl.kevinvandervlist.ohti.config.Config
 import nl.kevinvandervlist.ohti.api.PortalAPI
-import nl.kevinvandervlist.ohti.api.model.{IthoZonedDateTime, MonitoringData}
+import nl.kevinvandervlist.ohti.config.Config
 
-import scala.concurrent.{Await, Future}
+import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
 import scala.language.postfixOps
-import scala.util.Success
 
 object Main extends App with LazyLogging {
-  val cfg = Config()
-  logger.info(s"Starting ohti for username ${cfg.username}...")
-  val portal = PortalAPI(cfg.url, cfg.username, cfg.password, debug = cfg.debug)
+  val tasks: Map[String, RunnableTask] = Map(
+    ListDevices.name -> ListDevices,
+    UsageDetails.name -> UsageDetails
+  )
 
-  val result: Future[List[MonitoringData]] = portal.energyDevices().map(eds => {
-    val today = IthoZonedDateTime.today
-    eds.map(ed => portal.retrieveDailyData(ed.id, today))
-  }).map(flist => Future.sequence(flist.map(_.transform(Success(_)))))
-    .flatMap(_.map(_.collect{ case Success(data) => data }))
-
-
-  val measurements = Await.result(result, 5000 millis)
-  measurements foreach { m =>
-    println(m)
+  if(args.length == 0) {
+    help()
+    System.exit(1)
   }
 
-  println("Done consuming measurements")
+  val queue: mutable.Stack[RunnableTask] = mutable.Stack()
+  for(arg <- args) {
+    arg match {
+      case "help" => help()
+      case task if tasks.contains(task) => queue.addOne(tasks(task))
+      case unknown => logger.error("Unknown task {}", unknown)
+    }
+  }
 
-  portal.stop()
+  if(queue.nonEmpty) {
+    val cfg = Config()
+    logger.info(s"Starting ohti for username ${cfg.username}...")
+    val portal = PortalAPI(cfg.url, cfg.username, cfg.password, debug = cfg.debug)
+
+    for(task <- queue) {
+      logger.info("Executing task {}", task.name)
+      task.apply(portal)
+      logger.info("Completed task {}", task.name)
+    }
+
+    portal.stop()
+  }
+
+  private def help(): Unit = {
+    logger.error("Available tasks are:")
+    for(n <- tasks.keys) {
+      logger.error(s"* $n")
+    }
+  }
 }
