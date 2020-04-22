@@ -11,7 +11,8 @@ import scala.language.postfixOps
 object Main extends App with LazyLogging {
   val tasks: Map[String, RunnableTask] = Map(
     ListDevices.name -> ListDevices,
-    UsageDetails.name -> UsageDetails
+    UsageDetails.name -> UsageDetails,
+    DailyAggregateSQLite.name -> DailyAggregateSQLite
   )
 
   if(args.length == 0) {

@@ -2,14 +2,13 @@ package nl.kevinvandervlist.ohti.main
 
 import java.io.{File, PrintWriter}
 import java.time.LocalDate
-import java.util.UUID
 
 import com.typesafe.scalalogging.LazyLogging
 import nl.kevinvandervlist.ohti.api.PortalAPI
 import nl.kevinvandervlist.ohti.api.model.{IthoZonedDateTime, MonitoringData}
 import nl.kevinvandervlist.ohti.config.Settings
 import nl.kevinvandervlist.ohti.main.DailyAggregateSQLite.devices
-import nl.kevinvandervlist.ohti.usage.{Devices, RetrieveTotal, UsageInfo}
+import nl.kevinvandervlist.ohti.usage.{Devices, RetrieveScenario, RetrieveTotal, UsageInfo}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -22,7 +21,6 @@ object UsageDetails extends RunnableTask with LazyLogging {
     val cfg = settings.taskConfig(name)
     val devs: Devices = devices(cfg)
 
-    val moveInDate = IthoZonedDateTime.fromPortalString(cfg.getString("move-in-date"))
     val contractDate = IthoZonedDateTime.fromPortalString(cfg.getString("contract-date"))
 
     val startOfYear = IthoZonedDateTime.fromPortalString(s"${LocalDate.now().getYear}-01-01T11:00:00")
@@ -35,21 +33,26 @@ object UsageDetails extends RunnableTask with LazyLogging {
     val quartile = IthoZonedDateTime.fromLocalDate(LocalDate.now.minusMonths(3))
     val year = IthoZonedDateTime.fromLocalDate(LocalDate.now.minusYears(1))
 
-    val cases: Map[String, UUID => Future[MonitoringData]] = Map(
-      "Move-in" -> (api.retrieveYearlyData(_, moveInDate, today)),
-      "YTD" -> (api.retrieveYearlyData(_, startOfYear)),
-      "Contract" -> (api.retrieveYearlyData(_, contractDate)),
-      "Year" -> (api.retrieveYearlyData(_, year)),
-      "Quartile" -> (api.retrieveQuarterlyData(_, quartile)),
-      "Month" -> (api.retrieveMonthlyData(_, month)),
-      "Week" -> (api.retrieveWeeklyData(_, week)),
-      "Yesterday" -> (api.retrieveDailyData(_, oneDayAgo)),
-      "TwoDaysAgo" -> (api.retrieveDailyData(_, twoDaysAgo)),
-      "ThreeDaysAgo" -> (api.retrieveDailyData(_, threeDaysAgo)),
+    val y2019s = IthoZonedDateTime.fromPortalString("2019-01-01T11:00:00").startOfDay
+    val y2019e = IthoZonedDateTime.fromPortalString("2019-12-31T11:00:00").endOfDay
+
+    val cases: Map[String, RetrieveScenario] = Map(
+      "Yesterday" -> RetrieveScenario(api.retrieveDailyData(_, oneDayAgo), oneDayAgo.startOfDay, oneDayAgo.endOfDay),
+      "TwoDaysAgo" -> RetrieveScenario(api.retrieveDailyData(_, twoDaysAgo), twoDaysAgo.startOfDay, twoDaysAgo.endOfDay),
+      "ThreeDaysAgo" -> RetrieveScenario(api.retrieveDailyData(_, threeDaysAgo), threeDaysAgo.startOfDay, threeDaysAgo.endOfDay),
+      "Contract" -> RetrieveScenario(api.retrieveYearlyData(_, contractDate), contractDate.startOfDay, today),
+      "YTD" -> RetrieveScenario(api.retrieveYearlyData(_, startOfYear), startOfYear.startOfDay, today),
+      "Year" -> RetrieveScenario(api.retrieveYearlyData(_, year), year.startOfDay, today),
+      "Quartile" -> RetrieveScenario(api.retrieveQuarterlyData(_, quartile), quartile.startOfDay, today),
+      "Month" -> RetrieveScenario(api.retrieveMonthlyData(_, month), month.startOfDay, today),
+      "Week" -> RetrieveScenario(api.retrieveWeeklyData(_, week), week.startOfDay, today),
+      "2019" -> RetrieveScenario(api.retrieveYearlyData(_, y2019s), y2019s, y2019e)
     )
 
     val maxDuration = 30000 millis
-    val infos = Await.result(new RetrieveTotal(cases, devs).fetch(), maxDuration)
+    val infos = Await
+      .result(new RetrieveTotal(cases, devs).fetch(), maxDuration)
+      .map(UsageInfo.apply)
 
     for(info <- infos) {
       logger.info(info.name)

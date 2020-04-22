@@ -2,31 +2,36 @@ package nl.kevinvandervlist.ohti.usage
 
 import java.util.UUID
 
-import nl.kevinvandervlist.ohti.api.model.MonitoringData
+import nl.kevinvandervlist.ohti.api.model.{IthoZonedDateTime, MonitoringData}
+import nl.kevinvandervlist.ohti.repository.data.{PeriodicUsage, TimeSpan}
 
 import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Success
 
-class RetrieveTotal(private val cases: Map[String, UUID => Future[MonitoringData]],
+case class RetrieveScenario(retriever: UUID => Future[MonitoringData],
+                            start: IthoZonedDateTime,
+                            end: IthoZonedDateTime)
+
+class RetrieveTotal(private val cases: Map[String, RetrieveScenario],
                     private val devices: Devices)() {
 
-  def fetch()(implicit ec: ExecutionContext): Future[List[UsageInfo]] = {
-    val results: immutable.Iterable[Future[UsageInfo]] = cases.map {
-      case (name, f) => retrieveTotalOfGroup(name, f)
+  def fetch()(implicit ec: ExecutionContext): Future[List[PeriodicUsage]] = {
+    val results: immutable.Iterable[Future[PeriodicUsage]] = cases.map {
+      case (name, r) => retrieveTotalOfGroup(name, r)
     }
     Future
       .sequence(results)
       .map(_.toList)
   }
 
-  private def retrieveTotalOfGroup(name: String, f: UUID => Future[MonitoringData])
-                                 (implicit ec: ExecutionContext): Future[UsageInfo] = for {
-    g <- retrieveTotalOfKind(f, devices.gas)
-    fb <- retrieveTotalOfKind(f, devices.feedback)
-    c <- retrieveTotalOfKind(f, devices.consumed)
-    p <- retrieveTotalOfKind(f, devices.produced)
-  } yield UsageInfo(name, g, fb, c, p)
+  private def retrieveTotalOfGroup(name: String, r: RetrieveScenario)
+                                 (implicit ec: ExecutionContext): Future[PeriodicUsage] = for {
+    g <- retrieveTotalOfKind(r.retriever, devices.gas)
+    fb <- retrieveTotalOfKind(r.retriever, devices.feedback)
+    c <- retrieveTotalOfKind(r.retriever, devices.consumed)
+    p <- retrieveTotalOfKind(r.retriever, devices.produced)
+  } yield PeriodicUsage(TimeSpan(r.start.asTimeStamp, r.end.asTimeStamp), name, g, fb, c, p)
 
   private def retrieveTotalOfKind(f: UUID => Future[MonitoringData], ids: List[UUID])
            (implicit ec: ExecutionContext): Future[BigDecimal] =

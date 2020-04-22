@@ -34,6 +34,17 @@ lazy val api = (project in file("api")).
     assemblyJarName in assembly := "api.jar",
   )
 
+lazy val repositories = (project in file("repositories")).
+  settings(commonSettings: _*).
+  settings(
+    name := "repositories",
+    libraryDependencies ++= Seq(
+      "org.xerial" % "sqlite-jdbc" % "3.30.1"
+    ),
+  ).settings(
+    assemblyJarName in assembly := "repositories.jar",
+  )
+
 lazy val main = (project in file("main")).
   settings(commonSettings: _*).
   settings(
@@ -44,4 +55,4 @@ lazy val main = (project in file("main")).
     ),
   ).settings(
     mainClass in assembly := Some("nl.kevinvandervlist.ohti.main.Main"),
-) .dependsOn(api)
+) .dependsOn(api, repositories)
