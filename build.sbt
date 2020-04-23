@@ -7,9 +7,12 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.13.1",
   scalacOptions ++= Seq(
     "-feature",
-    // "-Xfatal-warnings", disabled for now
+    // "-Werror", disabled for now
     "-deprecation",
-    "-unchecked"
+    "-unchecked",
+    "-Wdead-code",
+    "-Wunused:imports,patvars,privates,locals,imports,explicits,implicits,params,linted",
+    "-Xlint:deprecation"
   ),
   libraryDependencies ++= Seq(
     "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
