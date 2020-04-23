@@ -5,7 +5,7 @@ import java.time.LocalDate
 
 import com.typesafe.scalalogging.LazyLogging
 import nl.kevinvandervlist.ohti.api.PortalAPI
-import nl.kevinvandervlist.ohti.api.model.{IthoZonedDateTime, MonitoringData}
+import nl.kevinvandervlist.ohti.api.model.IthoZonedDateTime
 import nl.kevinvandervlist.ohti.config.Settings
 import nl.kevinvandervlist.ohti.main.DailyAggregateSQLite.devices
 import nl.kevinvandervlist.ohti.usage.{Devices, RetrieveScenario, RetrieveTotal, UsageInfo}
@@ -36,17 +36,17 @@ object UsageDetails extends RunnableTask with LazyLogging {
     val y2019s = IthoZonedDateTime.fromPortalString("2019-01-01T11:00:00").startOfDay
     val y2019e = IthoZonedDateTime.fromPortalString("2019-12-31T11:00:00").endOfDay
 
-    val cases: Map[String, RetrieveScenario] = Map(
-      "Yesterday" -> RetrieveScenario(api.retrieveDailyData(_, oneDayAgo), oneDayAgo.startOfDay, oneDayAgo.endOfDay),
-      "TwoDaysAgo" -> RetrieveScenario(api.retrieveDailyData(_, twoDaysAgo), twoDaysAgo.startOfDay, twoDaysAgo.endOfDay),
-      "ThreeDaysAgo" -> RetrieveScenario(api.retrieveDailyData(_, threeDaysAgo), threeDaysAgo.startOfDay, threeDaysAgo.endOfDay),
-      "Contract" -> RetrieveScenario(api.retrieveYearlyData(_, contractDate), contractDate.startOfDay, today),
-      "YTD" -> RetrieveScenario(api.retrieveYearlyData(_, startOfYear), startOfYear.startOfDay, today),
-      "Year" -> RetrieveScenario(api.retrieveYearlyData(_, year), year.startOfDay, today),
-      "Quartile" -> RetrieveScenario(api.retrieveQuarterlyData(_, quartile), quartile.startOfDay, today),
-      "Month" -> RetrieveScenario(api.retrieveMonthlyData(_, month), month.startOfDay, today),
-      "Week" -> RetrieveScenario(api.retrieveWeeklyData(_, week), week.startOfDay, today),
-      "2019" -> RetrieveScenario(api.retrieveYearlyData(_, y2019s), y2019s, y2019e)
+    val cases = Set(
+      RetrieveScenario("Yesterday", api.retrieveDailyData(_, oneDayAgo), oneDayAgo.startOfDay, oneDayAgo.endOfDay),
+      RetrieveScenario("TwoDaysAgo", api.retrieveDailyData(_, twoDaysAgo), twoDaysAgo.startOfDay, twoDaysAgo.endOfDay),
+      RetrieveScenario("ThreeDaysAgo", api.retrieveDailyData(_, threeDaysAgo), threeDaysAgo.startOfDay, threeDaysAgo.endOfDay),
+      RetrieveScenario("Contract", api.retrieveYearlyData(_, contractDate), contractDate.startOfDay, today),
+      RetrieveScenario("YTD", api.retrieveYearlyData(_, startOfYear), startOfYear.startOfDay, today),
+      RetrieveScenario("Year", api.retrieveYearlyData(_, year), year.startOfDay, today),
+      RetrieveScenario("Quartile", api.retrieveQuarterlyData(_, quartile), quartile.startOfDay, today),
+      RetrieveScenario("Month", api.retrieveMonthlyData(_, month), month.startOfDay, today),
+      RetrieveScenario("Week", api.retrieveWeeklyData(_, week), week.startOfDay, today),
+      RetrieveScenario("2019", api.retrieveYearlyData(_, y2019s), y2019s, y2019e)
     )
 
     val maxDuration = 30000 millis

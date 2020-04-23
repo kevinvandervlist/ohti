@@ -9,29 +9,35 @@ import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Success
 
-case class RetrieveScenario(retriever: UUID => Future[MonitoringData],
+case class RetrieveScenario(name: String,
+                            retriever: UUID => Future[MonitoringData],
                             start: IthoZonedDateTime,
                             end: IthoZonedDateTime)
 
-class RetrieveTotal(private val cases: Map[String, RetrieveScenario],
+object RetrieveTotal {
+  def apply(cases: Set[RetrieveScenario], devices: Devices): RetrieveTotal =
+    new RetrieveTotal(cases, devices)
+  def apply(`case`: RetrieveScenario, devices: Devices): RetrieveTotal =
+    apply(Set(`case`), devices)
+}
+
+class RetrieveTotal(private val cases: Set[RetrieveScenario],
                     private val devices: Devices)() {
 
   def fetch()(implicit ec: ExecutionContext): Future[List[PeriodicUsage]] = {
-    val results: immutable.Iterable[Future[PeriodicUsage]] = cases.map {
-      case (name, r) => retrieveTotalOfGroup(name, r)
-    }
+    val results: immutable.Iterable[Future[PeriodicUsage]] = cases.map(retrieveTotalOfGroup)
     Future
       .sequence(results)
       .map(_.toList)
   }
 
-  private def retrieveTotalOfGroup(name: String, r: RetrieveScenario)
+  private def retrieveTotalOfGroup(r: RetrieveScenario)
                                  (implicit ec: ExecutionContext): Future[PeriodicUsage] = for {
     g <- retrieveTotalOfKind(r.retriever, devices.gas)
     fb <- retrieveTotalOfKind(r.retriever, devices.feedback)
     c <- retrieveTotalOfKind(r.retriever, devices.consumed)
     p <- retrieveTotalOfKind(r.retriever, devices.produced)
-  } yield PeriodicUsage(TimeSpan(r.start.asTimeStamp, r.end.asTimeStamp), name, g, fb, c, p)
+  } yield PeriodicUsage(TimeSpan(r.start.asTimeStamp, r.end.asTimeStamp), r.name, g, fb, c, p)
 
   private def retrieveTotalOfKind(f: UUID => Future[MonitoringData], ids: List[UUID])
            (implicit ec: ExecutionContext): Future[BigDecimal] =

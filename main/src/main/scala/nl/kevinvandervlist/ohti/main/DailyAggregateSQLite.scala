@@ -27,8 +27,8 @@ object DailyAggregateSQLite extends RunnableTask with KnownDevices with LazyLogg
       .fromLocalDate(LocalDate.now.minusDays(1))
       .startOfDay
 
-    val cases: Map[String, RetrieveScenario] = Map(
-      yesterday.asPortalString.splitAt(10)._1 -> RetrieveScenario(api.retrieveDailyData(_, yesterday), yesterday.startOfDay, yesterday.endOfDay),
+    val cases = Set(
+      RetrieveScenario(yesterday.asPortalString.splitAt(10)._1, api.retrieveDailyData(_, yesterday), yesterday.startOfDay, yesterday.endOfDay),
     )
     val ts = TimeSpan(yesterday.startOfDay.asTimeStamp, yesterday.endOfDay.asTimeStamp)
     val repo = PeriodicUsageRepository(cfg.getString("database"))
