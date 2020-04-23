@@ -4,7 +4,7 @@ lazy val commonSettings = Seq(
   organization := "nl.kevinvandervlist",
   name := "ohti",
   version := "0.0.1-SNAPSHOT",
-  scalaVersion := "2.13.1",
+  scalaVersion := "2.13.2",
   scalacOptions ++= Seq(
     "-feature",
     // "-Werror", disabled for now
@@ -27,10 +27,10 @@ lazy val api = (project in file("api")).
   settings(
     name := "api",
     libraryDependencies ++= Seq(
-      "io.reactivex.rxjava3" % "rxjava" % "3.0.0",
-      "com.softwaremill.sttp.client" %% "core" % "2.0.1",
-      "com.softwaremill.sttp.client" %% "circe" % "2.0.1",
-      "com.softwaremill.sttp.client" %% "slf4j-backend" % "2.0.1",
+      "io.reactivex.rxjava3" % "rxjava" % "3.0.2",
+      "com.softwaremill.sttp.client" %% "core" % "2.0.9",
+      "com.softwaremill.sttp.client" %% "circe" % "2.0.9",
+      "com.softwaremill.sttp.client" %% "slf4j-backend" % "2.0.9",
       "io.circe" %% "circe-optics" % "0.13.0"
     ),
   ).settings(
