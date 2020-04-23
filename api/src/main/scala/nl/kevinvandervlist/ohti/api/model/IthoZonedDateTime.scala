@@ -51,4 +51,7 @@ case class IthoZonedDateTime(private val zonedDateTime: ZonedDateTime) {
 
   def between(other: IthoZonedDateTime, unit: ChronoUnit): Long =
    unit.between(zonedDateTime, other.zonedDateTime)
+
+  def add(amount: Int, unit: ChronoUnit): IthoZonedDateTime =
+    IthoZonedDateTime(zonedDateTime.plus(amount, unit))
 }

@@ -12,7 +12,8 @@ object Main extends App with LazyLogging {
   val tasks: Map[String, RunnableTask] = Map(
     ListDevices.name -> ListDevices,
     UsageDetails.name -> UsageDetails,
-    DailyAggregateSQLite.name -> DailyAggregateSQLite
+    DailyAggregateSQLite.name -> DailyAggregateSQLite,
+    CatchupDailyAggregateSQLite.name -> CatchupDailyAggregateSQLite
   )
 
   if(args.length == 0) {

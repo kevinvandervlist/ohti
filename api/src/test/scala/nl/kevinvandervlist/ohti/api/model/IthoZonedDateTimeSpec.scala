@@ -49,6 +49,18 @@ class IthoZonedDateTimeSpec extends AnyWordSpec with Matchers {
       a.between(b, ChronoUnit.WEEKS) shouldBe 54
       a.between(b, ChronoUnit.DAYS) shouldBe 382
     }
+
+    "add a day" in {
+      val a = IthoZonedDateTime.fromPortalString("2019-03-16T11:00:00")
+      val b = IthoZonedDateTime.fromPortalString("2019-03-17T11:00:00")
+      a.add(1, ChronoUnit.DAYS) shouldBe b
+    }
+
+    "add a month" in {
+      val a = IthoZonedDateTime.fromPortalString("2020-02-16T11:00:00")
+      val b = IthoZonedDateTime.fromPortalString("2020-03-16T11:00:00")
+      a.add(1, ChronoUnit.MONTHS) shouldBe b
+    }
   }
 }
 
