@@ -1,7 +1,7 @@
 package nl.kevinvandervlist.ohti.portal
 
 import com.typesafe.scalalogging.LazyLogging
-import nl.kevinvandervlist.ohti.portal.TokenManager.{TokenProvider, TokenResponse}
+import nl.kevinvandervlist.ohti.portal.TokenManager.TokenProvider
 import sttp.client.{Empty, RequestT, basicRequest}
 
 object Util extends LazyLogging {

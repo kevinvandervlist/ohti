@@ -6,7 +6,6 @@ import nl.kevinvandervlist.ohti.config.Config
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.language.postfixOps
 
 object Main extends App with LazyLogging {
   val tasks: Map[String, RunnableTask] = Map(

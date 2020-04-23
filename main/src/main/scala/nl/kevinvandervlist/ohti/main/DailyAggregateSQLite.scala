@@ -7,7 +7,7 @@ import nl.kevinvandervlist.ohti.api.PortalAPI
 import nl.kevinvandervlist.ohti.api.model.IthoZonedDateTime
 import nl.kevinvandervlist.ohti.config.Settings
 import nl.kevinvandervlist.ohti.repository.PeriodicUsageRepository
-import nl.kevinvandervlist.ohti.usage.{Devices, KnownDevices, PeriodicAggregateSQLite, RetrieveScenario, RetrieveTotal}
+import nl.kevinvandervlist.ohti.usage.{Devices, KnownDevices, PeriodicAggregateSQLite, RetrieveScenario}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}

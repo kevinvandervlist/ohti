@@ -2,7 +2,6 @@ package nl.kevinvandervlist.ohti.portal
 
 import java.util.UUID
 
-import com.typesafe.scalalogging.LazyLogging
 import io.circe.{Decoder, HCursor}
 import nl.kevinvandervlist.ohti.api.model.{ElectricityLowTariff, ElectricityNormalTariff, EnergyDevice, EnergyType, Gas, IthoZonedDateTime}
 import nl.kevinvandervlist.ohti.portal.EnergyDevices._
@@ -46,6 +45,6 @@ class EnergyDevices(private implicit val endpoint: Endpoint,
     val response = request
       .response(asJson[List[EnergyDevice]])
 
-    doRequest("Failed to retrieve devices, got code {} - {}", request, response)
+    doRequest("Failed to retrieve devices, got code {} - {}", response)
   }
 }

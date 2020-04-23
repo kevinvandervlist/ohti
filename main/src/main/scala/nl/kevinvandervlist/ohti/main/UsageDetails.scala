@@ -11,7 +11,7 @@ import nl.kevinvandervlist.ohti.main.DailyAggregateSQLite.devices
 import nl.kevinvandervlist.ohti.usage.{Devices, RetrieveScenario, RetrieveTotal, UsageInfo}
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext}
 import scala.language.postfixOps
 
 object UsageDetails extends RunnableTask with LazyLogging {

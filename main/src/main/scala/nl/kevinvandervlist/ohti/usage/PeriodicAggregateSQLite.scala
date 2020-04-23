@@ -5,7 +5,6 @@ import nl.kevinvandervlist.ohti.repository.PeriodicUsageRepository
 import nl.kevinvandervlist.ohti.repository.data.{PeriodicUsage, TimeSpan}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.language.postfixOps
 import scala.util.{Failure, Success}
 
 class PeriodicAggregateSQLite(repo: PeriodicUsageRepository, devices: Devices)(implicit ec: ExecutionContext) extends LazyLogging {

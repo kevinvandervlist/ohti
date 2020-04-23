@@ -2,8 +2,6 @@ package nl.kevinvandervlist.ohti.portal
 
 import java.util.UUID
 
-import com.typesafe.scalalogging.LazyLogging
-import io.circe
 import io.circe.{Decoder, HCursor}
 import nl.kevinvandervlist.ohti.api.model.{CubicMeter, DataUnit, IthoZonedDateTime, MonitoringData, Watthour}
 import nl.kevinvandervlist.ohti.portal.TokenManager._
@@ -61,6 +59,6 @@ class Monitoring(private implicit val endpoint: Endpoint,
     val response = request
       .response(asJson[MonitoringData])
 
-    doRequest("Failed to retrieve devices, got code {} - {}", request, response)
+    doRequest("Failed to retrieve devices, got code {} - {}", response)
   }
 }
