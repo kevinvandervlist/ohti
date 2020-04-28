@@ -5,3 +5,4 @@ target/*
 main/src/main/resources/application.conf
 */target/*
 script/deploy
+notebook/**
