@@ -88,7 +88,7 @@ private[api] class AsyncPortalAPI(username: String, password: String)
     ) getOrElse List.empty
   }
 
-  override def monitoringData(interval: Int, uuid: UUID, measurementCount: Int, start: IthoZonedDateTime): Future[MonitoringData] = Future {
+  override def monitoringData(interval: Int, uuid: UUID, measurementCount: Int, start: IthoZonedDateTime): Future[List[MonitoringData]] = Future {
     val msg = "Retrieving monitoring data was successful, but no valid response found"
     logFailure(monitoringFeature.retrieveMonitoringData(interval, uuid, measurementCount, start),
       msg

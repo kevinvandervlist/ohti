@@ -10,7 +10,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Success
 
 case class RetrieveScenario(name: String,
-                            retriever: UUID => Future[MonitoringData],
+                            retriever: UUID => Future[List[MonitoringData]],
                             start: IthoZonedDateTime,
                             end: IthoZonedDateTime)
 
@@ -39,9 +39,10 @@ class RetrieveTotal(private val cases: Set[RetrieveScenario],
     p <- retrieveTotalOfKind(r.retriever, devices.produced)
   } yield PeriodicUsage(TimeSpan(r.start.asTimeStamp, r.end.asTimeStamp), r.name, g, fb, c, p)
 
-  private def retrieveTotalOfKind(f: UUID => Future[MonitoringData], ids: List[UUID])
+  private def retrieveTotalOfKind(f: UUID => Future[List[MonitoringData]], ids: List[UUID])
            (implicit ec: ExecutionContext): Future[BigDecimal] =
     retrieve(f, ids)
+      .map(_.head)
       .map(_.map(md => Some(md.data.foldLeft(zero)(acc))))
       .map(_.foldLeft(zero)(acc))
 

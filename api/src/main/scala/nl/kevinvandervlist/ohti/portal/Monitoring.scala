@@ -18,6 +18,8 @@ object Monitoring {
         case 10 => Watthour
         case 20 => CubicMeter
         case 30 => Celcius
+        case 60 => CO2
+        case 50 => FanSpeed
       }
     }
   }
@@ -25,18 +27,15 @@ object Monitoring {
   case class HackMixedDoubleAndStrings(s: String)
 
   implicit val decodeMonitoringData: Decoder[MonitoringData] = new Decoder[MonitoringData] {
-    final def apply(c: HCursor): Decoder.Result[MonitoringData] = {
-      val arr = c.downArray
-      for {
-        id <- arr.downField("deviceId").as[String]
-        unit <- arr.downField("dataUnit").as[DataUnit]
-        start <- arr.downField("dateStart").as[Long]
-        ts <- arr.downField("timeStamp").as[Long]
-        data <- arr.downField("data").as[List[HackMixedDoubleAndStrings]](Decoder.decodeList(dataDecoder))
-      } yield {
-        def bd(d: HackMixedDoubleAndStrings): Option[BigDecimal] = if(d.s == "NaN") { None } else { Some(BigDecimal(d.s)) }
-        MonitoringData(UUID.fromString(id), unit, IthoZonedDateTime.fromTimeStamp(start), IthoZonedDateTime.fromTimeStamp(ts), data.map(bd))
-      }
+    final def apply(c: HCursor): Decoder.Result[MonitoringData] = for {
+      id <- c.downField("deviceId").as[String]
+      unit <- c.downField("dataUnit").as[DataUnit]
+      start <- c.downField("dateStart").as[Long]
+      ts <- c.downField("timeStamp").as[Long]
+      data <- c.downField("data").as[List[HackMixedDoubleAndStrings]](Decoder.decodeList(dataDecoder))
+    } yield {
+      def bd(d: HackMixedDoubleAndStrings): Option[BigDecimal] = if(d.s == "NaN") { None } else { Some(BigDecimal(d.s)) }
+      MonitoringData(UUID.fromString(id), unit, IthoZonedDateTime.fromTimeStamp(start), IthoZonedDateTime.fromTimeStamp(ts), data.map(bd))
     }
   }
 
@@ -49,14 +48,14 @@ object Monitoring {
 
 class Monitoring(private implicit val endpoint: Endpoint,
                  private implicit val tokenProvider: TokenProvider,
-                 protected implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends Client[MonitoringData] {
+                 protected implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends Client[List[MonitoringData]] {
 
-  def retrieveMonitoringData(interval: Int, uuid: UUID, measurementCount: Int, start: IthoZonedDateTime): Option[MonitoringData] = {
+  def retrieveMonitoringData(interval: Int, uuid: UUID, measurementCount: Int, start: IthoZonedDateTime): Option[List[MonitoringData]] = {
     val request = Util.authorizedRequest(tokenProvider)
       .get(endpoint.monitoring(interval, uuid.toString, measurementCount, start.asTimeStamp))
 
     val response = request
-      .response(asJson[MonitoringData])
+      .response(asJson[List[MonitoringData]])
 
     doRequest("Failed to retrieve devices, got code {} - {}", response)
   }
