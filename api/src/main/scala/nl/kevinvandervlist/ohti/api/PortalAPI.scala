@@ -70,7 +70,8 @@ trait PortalAPI {
 
   /**
    * Retrieve yearly data for a given device and moment (will automatically start at the beginning of the day).
-   * This is equivalent to the web portal 'year' option.
+   * This is equivalent to the web portal 'year' option, except it can be a longer timespan
+   * (but with weekly precision).
    */
   def retrieveYearlyData(uuid: UUID, _start: IthoZonedDateTime, _end: IthoZonedDateTime): Future[MonitoringData] = {
     val start = _start.startOfDay
