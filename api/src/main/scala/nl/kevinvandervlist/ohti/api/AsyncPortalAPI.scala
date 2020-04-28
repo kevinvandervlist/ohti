@@ -2,14 +2,14 @@ package nl.kevinvandervlist.ohti.api
 
 import java.util.UUID
 
-import nl.kevinvandervlist.ohti.api.model.{EnergyDevice, IthoZonedDateTime, MonitoringData}
+import nl.kevinvandervlist.ohti.api.model.{EnergyDevice, IthoZonedDateTime, MonitoringData, Zone}
 import nl.kevinvandervlist.ohti.portal.TokenManager.{TokenProvider, TokenResponse}
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 import java.util.concurrent.{ScheduledExecutorService, _}
 
 import com.typesafe.scalalogging.LazyLogging
-import nl.kevinvandervlist.ohti.portal.{Endpoint, EnergyDevices, Monitoring, TokenManager}
+import nl.kevinvandervlist.ohti.portal.{Endpoint, EnergyDevices, Monitoring, TokenManager, Zones}
 import sttp.client.{Identity, NothingT, SttpBackend}
 
 private[api] class AsyncPortalAPI(username: String, password: String)
@@ -38,27 +38,7 @@ private[api] class AsyncPortalAPI(username: String, password: String)
   // Portal features
   private val energyDevicesFeature = new EnergyDevices()
   private val monitoringFeature = new Monitoring()
-
-  override def energyDevices(): Future[List[EnergyDevice]] = Future {
-    energyDevicesFeature.retrieveDevices() match {
-      case Some(devices) =>
-        devices
-      case None =>
-        logger.warn("Retrieving energy devices was successful, but no valid response found")
-        List.empty
-    }
-  }
-
-  override def monitoringData(interval: Int, uuid: UUID, measurementCount: Int, start: IthoZonedDateTime): Future[MonitoringData] = Future {
-    monitoringFeature.retrieveMonitoringData(interval, uuid, measurementCount, start) match {
-      case Some(data) =>
-        data
-      case None =>
-        val msg = "Retrieving monitoring data was successful, but no valid response found"
-        logger.warn(msg)
-        throw new NoSuchElementException(msg)
-    }
-  }
+  private val zonesFeature = new Zones()
 
   override def stop(): Unit = try {
     scheduledRefresh.map(_.cancel(true))
@@ -79,7 +59,7 @@ private[api] class AsyncPortalAPI(username: String, password: String)
     def refresh: Callable[Unit] = new Callable[Unit] {
       override def call(): Unit = {
         bearer.flatMap(tokenManager.refreshToken) match {
-          case bt @ Some(updated) =>
+          case bt@Some(updated) =>
             bearer = bt
             registerRefresh(updated)
             logger.debug(s"Refreshed bearer token for $username successfully")
@@ -93,5 +73,34 @@ private[api] class AsyncPortalAPI(username: String, password: String)
     val refreshAt = (tr.expires_in * 0.95).toLong
     logger.debug(s"Registering bearer token refresh call in $refreshAt seconds")
     scheduledRefresh = Some(pool.schedule(refresh, refreshAt, TimeUnit.SECONDS))
+  }
+
+  private def logFailure[T](result: Option[T], msg: String): Option[T] = result match {
+    case result: Some[T] => result
+    case None =>
+      logger.warn(msg)
+      None
+  }
+
+  override def energyDevices(): Future[List[EnergyDevice]] = Future {
+    logFailure(energyDevicesFeature.retrieveDevices(),
+      "Retrieving energy devices was successful, but no valid response found"
+    ) getOrElse List.empty
+  }
+
+  override def monitoringData(interval: Int, uuid: UUID, measurementCount: Int, start: IthoZonedDateTime): Future[MonitoringData] = Future {
+    val msg = "Retrieving monitoring data was successful, but no valid response found"
+    logFailure(monitoringFeature.retrieveMonitoringData(interval, uuid, measurementCount, start),
+      msg
+    ) match {
+      case Some(result) => result
+      case None => throw new NoSuchElementException(msg)
+    }
+  }
+
+  override def zones(): Future[List[Zone]] = Future {
+    logFailure(zonesFeature.retrieveZones(),
+      "Retrieving zones succeeded, but no valid response found."
+    ) getOrElse List.empty
   }
 }

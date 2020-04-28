@@ -11,4 +11,6 @@ case class Endpoint(private val baseURL: String) {
   def monitoring(interval: Int, uuid: String, measurementCount: Int, start: Long): Uri = {
     uri"$baseURL/api/monitoring/$interval/devices/$uuid/?take=$measurementCount&start=$start"
   }
+
+  def zones: Uri = uri"$baseURL/api/zones"
 }

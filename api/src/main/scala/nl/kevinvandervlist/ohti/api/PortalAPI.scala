@@ -5,7 +5,7 @@ import java.util.UUID
 import java.util.concurrent.{Executors, ScheduledExecutorService}
 
 import sttp.client.logging.slf4j._
-import nl.kevinvandervlist.ohti.api.model.{EnergyDevice, IthoZonedDateTime, MonitoringData}
+import nl.kevinvandervlist.ohti.api.model._
 import nl.kevinvandervlist.ohti.portal.Endpoint
 import sttp.client.{HttpURLConnectionBackend, Identity, NothingT, SttpBackend}
 
@@ -29,10 +29,29 @@ object PortalAPI {
  * An opinionated, high level API wrapping the Mijn Itho Daalderop portal
  */
 trait PortalAPI {
+  /** List all energy devices associated with the current account */
   def energyDevices(): Future[List[EnergyDevice]]
-  def monitoringData(interval: Int, uuid: UUID, measurementCount: Int, start: IthoZonedDateTime): Future[MonitoringData]
+
+  /**
+   * Retrieve a list of zones associated with this account.
+   *
+   * A zone is a room or area that has zero or more devices associated to it.
+   * @return
+   */
+  def zones(): Future[List[Zone]]
   /** Stop this portal API instance (destructor) */
   def stop(): Unit = ()
+
+  /**
+   * Retrieve monitoring data of a given device
+   *
+   * @param interval The interval (in minutes) that a single measurement should represent (minimum is 15)
+   * @param uuid The UUID of the device you want to retrieve measurements of
+   * @param measurementCount The number of data points to retrieve
+   * @param start The timestamp denoting the initial datapoint
+   * @return A series of MonitoringData elements
+   */
+  def monitoringData(interval: Int, uuid: UUID, measurementCount: Int, start: IthoZonedDateTime): Future[MonitoringData]
 
   /**
    * Retrieve daily data for a given device and moment (will automatically start at the beginning of the day).

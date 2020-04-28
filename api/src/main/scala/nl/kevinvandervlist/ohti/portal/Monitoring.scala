@@ -3,7 +3,7 @@ package nl.kevinvandervlist.ohti.portal
 import java.util.UUID
 
 import io.circe.{Decoder, HCursor}
-import nl.kevinvandervlist.ohti.api.model.{CubicMeter, DataUnit, IthoZonedDateTime, MonitoringData, Watthour}
+import nl.kevinvandervlist.ohti.api.model._
 import nl.kevinvandervlist.ohti.portal.TokenManager._
 import nl.kevinvandervlist.ohti.portal.Monitoring._
 import sttp.client._
@@ -17,6 +17,7 @@ object Monitoring {
       u match {
         case 10 => Watthour
         case 20 => CubicMeter
+        case 30 => Celcius
       }
     }
   }
@@ -31,10 +32,8 @@ object Monitoring {
         unit <- arr.downField("dataUnit").as[DataUnit]
         start <- arr.downField("dateStart").as[Long]
         ts <- arr.downField("timeStamp").as[Long]
-        //data <- arr.downField("data").as[List[String]]
         data <- arr.downField("data").as[List[HackMixedDoubleAndStrings]](Decoder.decodeList(dataDecoder))
       } yield {
-        //def bd(d: Double): Option[BigDecimal] = if(d.isNaN) { None } else { Some(BigDecimal(d)) }
         def bd(d: HackMixedDoubleAndStrings): Option[BigDecimal] = if(d.s == "NaN") { None } else { Some(BigDecimal(d.s)) }
         MonitoringData(UUID.fromString(id), unit, IthoZonedDateTime.fromTimeStamp(start), IthoZonedDateTime.fromTimeStamp(ts), data.map(bd))
       }
