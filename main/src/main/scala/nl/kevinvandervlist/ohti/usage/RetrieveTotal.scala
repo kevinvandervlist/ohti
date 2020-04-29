@@ -42,16 +42,16 @@ class RetrieveTotal(private val cases: Set[RetrieveScenario],
   private def retrieveTotalOfKind(f: UUID => Future[List[MonitoringData]], ids: List[UUID])
            (implicit ec: ExecutionContext): Future[BigDecimal] =
     retrieve(f, ids)
-      .map(_.head)
       .map(_.map(md => Some(md.data.foldLeft(zero)(acc))))
       .map(_.foldLeft(zero)(acc))
 
   private val zero: BigDecimal = BigDecimal(0)
 
-  private def retrieve[K, T](f: K => Future[T], ids: List[K])
+  // Note that this is quite messy -- we just assume there is only one energy device per id
+  private def retrieve[K, T](f: K => Future[List[T]], ids: List[K])
                             (implicit ec: ExecutionContext): Future[List[T]] = Future
     .sequence(ids.map(f).map(_.transform(Success(_))))
-    .map(_.collect{ case Success(data) => data })
+    .map(_.collect{ case Success(data) => data.head })
 
   private def acc(acc: BigDecimal, v: Option[BigDecimal]): BigDecimal = v match {
     case Some(bd) => acc + bd
