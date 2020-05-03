@@ -2,7 +2,7 @@ package nl.kevinvandervlist.ohti.api
 
 import java.util.UUID
 
-import nl.kevinvandervlist.ohti.api.model.{EnergyDevice, IthoZonedDateTime, MonitoringData, Zone}
+import nl.kevinvandervlist.ohti.api.model.{IthoZonedDateTime, MonitoringData, Zone}
 import nl.kevinvandervlist.ohti.portal.TokenManager.{TokenProvider, TokenResponse}
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
@@ -82,10 +82,10 @@ private[api] class AsyncPortalAPI(username: String, password: String)
       None
   }
 
-  override def energyDevices(): Future[List[EnergyDevice]] = Future {
+  override def energyDevices(): Future[nl.kevinvandervlist.ohti.api.model.EnergyDevices] = Future {
     logFailure(energyDevicesFeature.retrieveDevices(),
       "Retrieving energy devices was successful, but no valid response found"
-    ) getOrElse List.empty
+    ) getOrElse nl.kevinvandervlist.ohti.api.model.EnergyDevices.apply(List.empty)
   }
 
   override def monitoringData(interval: Int, uuid: UUID, measurementCount: Int, start: IthoZonedDateTime): Future[List[MonitoringData]] = Future {

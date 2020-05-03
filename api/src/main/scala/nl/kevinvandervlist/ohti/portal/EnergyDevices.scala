@@ -35,42 +35,19 @@ object EnergyDevices {
     case 20 => Gas
     case otherwise => throw new NotImplementedError(s"Unknown energy type: $otherwise")
   }
-
-  implicit class RichEnergyDevices(val devices: List[EnergyDevice]) {
-    def gasMeters: List[EnergyDevice] = devices
-      .filter(_.energyType == Gas)
-      .filter(_.isOnline)
-
-    def electricCentralMeterConsumption: List[EnergyDevice] = devices
-      .filter(_.isCentralMeter)
-      .filterNot(_.isProducer)
-      .filter(_.isOnline)
-      .filter(_.energyType == Electricity)
-
-    def electricCentralMeterFeedback: List[EnergyDevice] = devices
-      .filter(_.isCentralMeter)
-      .filter(_.isProducer)
-      .filter(_.isOnline)
-      .filter(_.energyType == Electricity)
-
-    def electricProduction: List[EnergyDevice] = devices
-      .filterNot(_.isCentralMeter)
-      .filter(_.isProducer)
-      .filter(_.isOnline)
-      .filter(_.energyType == Electricity)
-  }
 }
 
 class EnergyDevices(private implicit val endpoint: Endpoint,
                     private implicit val tokenProvider: TokenProvider,
-                    protected implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends Client[List[EnergyDevice]] {
+                    protected implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends Client[nl.kevinvandervlist.ohti.api.model.EnergyDevices] {
 
-  def retrieveDevices(): Option[List[EnergyDevice]] = {
+  def retrieveDevices(): Option[nl.kevinvandervlist.ohti.api.model.EnergyDevices] = {
     val request = Util.authorizedRequest(tokenProvider)
       .get(endpoint.energyDevices)
 
     val response = request
       .response(asJson[List[EnergyDevice]])
+      .mapResponseRight(nl.kevinvandervlist.ohti.api.model.EnergyDevices.apply)
 
     doRequest("Failed to retrieve devices, got code {} - {}", response)
   }

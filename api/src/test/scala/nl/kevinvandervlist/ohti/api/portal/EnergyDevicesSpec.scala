@@ -3,7 +3,6 @@ package nl.kevinvandervlist.ohti.api.portal
 import java.util.UUID
 
 import nl.kevinvandervlist.ohti.portal.{Endpoint, EnergyDevices}
-import nl.kevinvandervlist.ohti.portal.EnergyDevices._
 import nl.kevinvandervlist.ohti.portal.TokenManager._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

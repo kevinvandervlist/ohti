@@ -30,7 +30,7 @@ object PortalAPI {
  */
 trait PortalAPI {
   /** List all energy devices associated with the current account */
-  def energyDevices(): Future[List[EnergyDevice]]
+  def energyDevices(): Future[EnergyDevices]
 
   /**
    * Retrieve a list of zones associated with this account.

@@ -4,7 +4,6 @@ import java.time.temporal.ChronoUnit
 
 import com.typesafe.scalalogging.LazyLogging
 import nl.kevinvandervlist.ohti.api.PortalAPI
-import nl.kevinvandervlist.ohti.portal.EnergyDevices._
 import nl.kevinvandervlist.ohti.api.model.IthoZonedDateTime
 import nl.kevinvandervlist.ohti.config.Settings
 import nl.kevinvandervlist.ohti.repository.PeriodicUsageRepository
