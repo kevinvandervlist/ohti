@@ -38,7 +38,7 @@ trait PortalAPI {
    * A zone is a room or area that has zero or more devices associated to it.
    * @return
    */
-  def zones(): Future[List[Zone]]
+  def zones(): Future[Zones]
   /** Stop this portal API instance (destructor) */
   def stop(): Unit = ()
 

@@ -1,7 +1,6 @@
 package nl.kevinvandervlist.ohti.api.model
 
 import java.util.UUID
-
 import scala.language.implicitConversions
 
 case class EnergyDevice(id: UUID,

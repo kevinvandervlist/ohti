@@ -43,14 +43,15 @@ object Zones {
 
 class Zones(private implicit val endpoint: Endpoint,
             private implicit val tokenProvider: TokenProvider,
-            protected implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends Client[List[Zone]] {
+            protected implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends Client[nl.kevinvandervlist.ohti.api.model.Zones] {
 
-  def retrieveZones(): Option[List[Zone]] = {
+  def retrieveZones(): Option[nl.kevinvandervlist.ohti.api.model.Zones] = {
     val request = Util.authorizedRequest(tokenProvider)
       .get(endpoint.zones)
 
     val response = request
       .response(asJson[List[Zone]])
+      .mapResponseRight(nl.kevinvandervlist.ohti.api.model.Zones.apply)
 
     doRequest("Failed to retrieve zones, got code {} - {}", response)
   }

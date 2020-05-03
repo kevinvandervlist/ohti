@@ -1,5 +1,7 @@
 package nl.kevinvandervlist.ohti.api.portal
 
+import java.util.UUID
+
 import nl.kevinvandervlist.ohti.portal.TokenManager._
 import nl.kevinvandervlist.ohti.portal.{Endpoint, Zones}
 import org.scalatest.matchers.should.Matchers
@@ -35,6 +37,29 @@ class ZonesSpec extends AnyWordSpec with Matchers {
       assertThrows[IllegalStateException] {
         new Zones().retrieveZones()
       }
+    }
+  }
+  "Zones conversion" should {
+    implicit val tokenProvider: TokenProvider = () => Some(TokenResponse("access", "type", 10, "refresh"))
+    val zones = new Zones().retrieveZones().get
+    "retrieve the fans" in {
+      val fanZones = zones.fans
+      fanZones.size shouldBe 1
+      fanZones.exists(_.id == UUID.fromString("3e3285c2-a3dc-4be6-b585-184c4733e386"))
+      val fans = fanZones.components
+      fans.size shouldBe 1
+      fans.exists(_.id == UUID.fromString("3e3285c2-a3dc-4be6-b585-184c4733e389"))
+    }
+    "retrieve the central electric consumption meter(s)" in {
+      val thermostatZones = zones.thermostats
+      thermostatZones.size shouldBe 2
+      thermostatZones.exists(_.id == UUID.fromString("3e3285c2-a3dc-4be6-b585-184c4733e385"))
+      thermostatZones.exists(_.id == UUID.fromString("3e3285c2-a3dc-4be6-b585-184c4733e386"))
+
+      val thermostats = thermostatZones.components
+      thermostats.size shouldBe 2
+      thermostats.exists(_.id == UUID.fromString("3e3285c2-a3dc-4be6-b585-184c4733e387"))
+      thermostats.exists(_.id == UUID.fromString("3e3285c2-a3dc-4be6-b585-184c4733e388"))
     }
   }
 }

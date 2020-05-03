@@ -2,7 +2,7 @@ package nl.kevinvandervlist.ohti.api
 
 import java.util.UUID
 
-import nl.kevinvandervlist.ohti.api.model.{IthoZonedDateTime, MonitoringData, Zone}
+import nl.kevinvandervlist.ohti.api.model.{IthoZonedDateTime, MonitoringData}
 import nl.kevinvandervlist.ohti.portal.TokenManager.{TokenProvider, TokenResponse}
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
@@ -98,9 +98,9 @@ private[api] class AsyncPortalAPI(username: String, password: String)
     }
   }
 
-  override def zones(): Future[List[Zone]] = Future {
+  override def zones(): Future[nl.kevinvandervlist.ohti.api.model.Zones] = Future {
     logFailure(zonesFeature.retrieveZones(),
       "Retrieving zones succeeded, but no valid response found."
-    ) getOrElse List.empty
+    ) getOrElse nl.kevinvandervlist.ohti.api.model.Zones(List.empty)
   }
 }

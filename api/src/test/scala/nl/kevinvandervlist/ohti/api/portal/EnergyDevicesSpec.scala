@@ -42,7 +42,7 @@ class EnergyDevicesSpec extends AnyWordSpec with Matchers {
       }
     }
   }
-  "Rich energy devices" should {
+  "Energy devices conversion" should {
     implicit val tokenProvider: TokenProvider = () => Some(TokenResponse("access", "type", 10, "refresh"))
     val energyDevices = new EnergyDevices().retrieveDevices().get
     "retrieve the gas meter(s)" in {
