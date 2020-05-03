@@ -10,7 +10,6 @@ See [here](https://tweakers.net/productreview/212044/itho-daalderop-spider-conne
 * An (easy) way to export data from the portal, so the data is not locked in the online environment. 
 
 ## Future work
-* Remove the manual (UUID-based) configuration of devices to an automated, discovery-based one (see list-devices).
 * Implement more of the API (compared to just what I personally need).
 
 ## Example usage

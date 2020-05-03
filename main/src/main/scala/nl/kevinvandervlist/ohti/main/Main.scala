@@ -9,7 +9,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object Main extends App with LazyLogging {
   val tasks: Map[String, RunnableTask] = Map(
-    ListDevices.name -> ListDevices,
     UsageDetails.name -> UsageDetails,
     DailyAggregateSQLite.name -> DailyAggregateSQLite,
     CatchupDailyAggregateSQLite.name -> CatchupDailyAggregateSQLite

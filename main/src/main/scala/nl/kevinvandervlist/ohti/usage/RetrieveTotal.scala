@@ -22,7 +22,7 @@ object RetrieveTotal {
 }
 
 class RetrieveTotal(private val cases: Set[RetrieveScenario],
-                    private val devices: Devices)() {
+                    private val devices: Devices) {
 
   def fetch()(implicit ec: ExecutionContext): Future[List[PeriodicUsage]] = {
     val results: immutable.Iterable[Future[PeriodicUsage]] = cases.map(retrieveTotalOfGroup)

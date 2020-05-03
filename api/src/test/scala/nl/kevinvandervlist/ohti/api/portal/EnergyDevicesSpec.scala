@@ -1,6 +1,9 @@
 package nl.kevinvandervlist.ohti.api.portal
 
+import java.util.UUID
+
 import nl.kevinvandervlist.ohti.portal.{Endpoint, EnergyDevices}
+import nl.kevinvandervlist.ohti.portal.EnergyDevices._
 import nl.kevinvandervlist.ohti.portal.TokenManager._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -38,6 +41,33 @@ class EnergyDevicesSpec extends AnyWordSpec with Matchers {
       assertThrows[IllegalStateException] {
         new EnergyDevices().retrieveDevices()
       }
+    }
+  }
+  "Rich energy devices" should {
+    implicit val tokenProvider: TokenProvider = () => Some(TokenResponse("access", "type", 10, "refresh"))
+    val energyDevices = new EnergyDevices().retrieveDevices().get
+    "retrieve the gas meter(s)" in {
+      val gas = energyDevices.gasMeters
+      gas.size shouldBe 1
+      gas.exists(_.id == UUID.fromString("45fba720-c04a-4b6c-a471-e9a5d5c0d3c3")) shouldBe true
+    }
+    "retrieve the central electric consumption meter(s)" in {
+      val e = energyDevices.electricCentralMeterConsumption
+      e.size shouldBe 2
+      e.exists(_.id == UUID.fromString("45fba720-c04a-4b6c-a471-e9a5d5c0d3c4")) shouldBe true
+      e.exists(_.id == UUID.fromString("45fba720-c04a-4b6c-a471-e9a5d5c0d3c6")) shouldBe true
+    }
+    "retrieve the central electric feedback meter(s)" in {
+      val e = energyDevices.electricCentralMeterFeedback
+      e.size shouldBe 2
+      e.exists(_.id == UUID.fromString("45fba720-c04a-4b6c-a471-e9a5d5c0d3c5")) shouldBe true
+      e.exists(_.id == UUID.fromString("45fba720-c04a-4b6c-a471-e9a5d5c0d3c7")) shouldBe true
+    }
+    "retrieve the central electric production meter(s)" in {
+      val e = energyDevices.electricProduction
+      e.size shouldBe 2
+      e.exists(_.id == UUID.fromString("45fba720-c04a-4b6c-a471-e9a5d5c0d3c8")) shouldBe true
+      e.exists(_.id == UUID.fromString("45fba720-c04a-4b6c-a471-e9a5d5c0d3c9")) shouldBe true
     }
   }
 }

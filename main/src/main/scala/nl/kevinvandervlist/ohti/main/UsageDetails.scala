@@ -5,9 +5,9 @@ import java.time.LocalDate
 
 import com.typesafe.scalalogging.LazyLogging
 import nl.kevinvandervlist.ohti.api.PortalAPI
+import nl.kevinvandervlist.ohti.portal.EnergyDevices._
 import nl.kevinvandervlist.ohti.api.model.IthoZonedDateTime
 import nl.kevinvandervlist.ohti.config.Settings
-import nl.kevinvandervlist.ohti.main.DailyAggregateSQLite.devices
 import nl.kevinvandervlist.ohti.usage.{Devices, RetrieveScenario, RetrieveTotal, UsageInfo}
 
 import scala.concurrent.duration._
@@ -19,8 +19,12 @@ object UsageDetails extends RunnableTask with LazyLogging {
 
   override def apply(api: PortalAPI, settings: Settings)(implicit ec: ExecutionContext): Unit = {
     val cfg = settings.taskConfig(name)
-    val devs: Devices = devices(cfg)
-
+    val devs = api.energyDevices().map(eds => Devices(
+      gas = eds.gasMeters.map(_.id),
+      consumed = eds.electricCentralMeterConsumption.map(_.id),
+      produced = eds.electricProduction.map(_.id),
+      feedback = eds.electricCentralMeterFeedback.map(_.id)
+    ))
     val contractDate = IthoZonedDateTime.fromPortalString(cfg.getString("contract-date"))
 
     val startOfYear = IthoZonedDateTime.fromPortalString(s"${LocalDate.now().getYear}-01-01T11:00:00")
@@ -51,7 +55,7 @@ object UsageDetails extends RunnableTask with LazyLogging {
 
     val maxDuration = 30000 millis
     val infos = Await
-      .result(new RetrieveTotal(cases, devs).fetch(), maxDuration)
+      .result(devs.flatMap(RetrieveTotal(cases, _).fetch()), maxDuration)
       .map(UsageInfo.apply)
 
     for(info <- infos) {
