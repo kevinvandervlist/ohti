@@ -34,13 +34,13 @@ class IthoZonedDateTimeSpec extends AnyWordSpec with Matchers {
     "be mapped from a date object" in {
       val now = LocalDate.now()
       val idt = IthoZonedDateTime.fromDate(new Date())
-      idt.startOfDay.asPortalString shouldBe s"${now.getYear}-${String.format("%02d", now.getMonth.getValue)}-${now.getDayOfMonth}T00:00:00"
+      idt.startOfDay.asPortalString shouldBe s"${now.getYear}-${String.format("%02d", now.getMonth.getValue)}-${String.format("%02d", now.getDayOfMonth)}T00:00:00"
     }
 
     "be mapped from a local date object" in {
       val yesterday = LocalDate.now
       val idt = IthoZonedDateTime.fromLocalDate(yesterday)
-      idt.startOfDay.asPortalString shouldBe s"${yesterday.getYear}-${String.format("%02d", yesterday.getMonth.getValue)}-${yesterday.getDayOfMonth}T00:00:00"
+      idt.startOfDay.asPortalString shouldBe s"${yesterday.getYear}-${String.format("%02d", yesterday.getMonth.getValue)}-${String.format("%02d", yesterday.getDayOfMonth)}T00:00:00"
     }
 
     "calculate right delta between two zdts" in {
