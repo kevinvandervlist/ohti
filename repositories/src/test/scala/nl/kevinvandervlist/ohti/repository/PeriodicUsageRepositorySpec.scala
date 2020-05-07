@@ -8,11 +8,11 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 class PeriodicUsageRepositorySpec extends AnyWordSpec with Matchers {
-  val memory = DriverManager.getConnection("jdbc:sqlite::memory:")
-  val repo = new PeriodicUsageRepositoryImpl(memory)
-  val tsOne = TimeSpan(10, 100)
-  val tsTwo = TimeSpan(10, 11)
-  val puOne = PeriodicUsage(tsOne, "one", BigDecimal(1), BigDecimal(2), BigDecimal(3), BigDecimal(4))
+  private val memory = DriverManager.getConnection("jdbc:sqlite::memory:")
+  private val repo = new PeriodicUsageRepositoryImpl(memory)
+  private val tsOne = TimeSpan(10, 100)
+  private val tsTwo = TimeSpan(10, 11)
+  private val puOne = PeriodicUsage(tsOne, "one", BigDecimal(1), BigDecimal(2), BigDecimal(3), BigDecimal(4))
   "The periodic usage repository" should {
     "not have an item when its empty" in {
       val result = repo.exists(tsOne)

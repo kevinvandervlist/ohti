@@ -46,7 +46,7 @@ lazy val repositories = (project in file("repositories")).
     ),
   ).settings(
     assemblyJarName in assembly := "repositories.jar",
-  )
+  ).dependsOn(api)
 
 lazy val main = (project in file("main")).
   settings(commonSettings: _*).
@@ -58,4 +58,4 @@ lazy val main = (project in file("main")).
     ),
   ).settings(
     mainClass in assembly := Some("nl.kevinvandervlist.ohti.main.Main"),
-) .dependsOn(api, repositories)
+).dependsOn(api, repositories)

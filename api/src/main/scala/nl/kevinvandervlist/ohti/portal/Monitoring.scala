@@ -32,10 +32,11 @@ object Monitoring {
       unit <- c.downField("dataUnit").as[DataUnit]
       start <- c.downField("dateStart").as[Long]
       ts <- c.downField("timeStamp").as[Long]
+      interval <- c.downField("dataGrouping").as[Int]
       data <- c.downField("data").as[List[HackMixedDoubleAndStrings]](Decoder.decodeList(dataDecoder))
     } yield {
       def bd(d: HackMixedDoubleAndStrings): Option[BigDecimal] = if(d.s == "NaN") { None } else { Some(BigDecimal(d.s)) }
-      MonitoringData(UUID.fromString(id), unit, IthoZonedDateTime.fromTimeStamp(start), IthoZonedDateTime.fromTimeStamp(ts), data.map(bd))
+      MonitoringData(UUID.fromString(id), unit, IthoZonedDateTime.fromTimeStamp(start), interval, IthoZonedDateTime.fromTimeStamp(ts), data.map(bd))
     }
   }
 

@@ -1,6 +1,6 @@
 package nl.kevinvandervlist.ohti.repository.impl
 
-import java.sql.{Connection, PreparedStatement}
+import java.sql.Connection
 
 import com.typesafe.scalalogging.LazyLogging
 import nl.kevinvandervlist.ohti.repository.PeriodicUsageRepository
@@ -8,15 +8,13 @@ import nl.kevinvandervlist.ohti.repository.data.{PeriodicUsage, TimeSpan}
 
 import scala.util.Try
 
-class PeriodicUsageRepositoryImpl(private val connection: Connection) extends PeriodicUsageRepository with LazyLogging {
+class PeriodicUsageRepositoryImpl(protected val connection: Connection) extends SQLiteRepository with PeriodicUsageRepository with LazyLogging {
   {
     val stmt = statement(createTableIfNotExists)
     stmt.executeUpdate()
     stmt.close()
   }
 
-  // INTEGER can be 1-8 bytes
-  // BigDecimal are stored as TEXT
   private def createTableIfNotExists: String =
     """CREATE TABLE IF NOT EXISTS periodic_usage (
       |  [from] INTEGER NOT NULL,
@@ -82,11 +80,7 @@ class PeriodicUsageRepositoryImpl(private val connection: Connection) extends Pe
        |  compensatedPowerBalance
        |FROM periodic_usage WHERE [from] = ? AND [to] = ?;
        |""".stripMargin
-  private def statement(query: String): PreparedStatement = {
-    val statement = connection.prepareStatement(query)
-    statement.setQueryTimeout(3)
-    statement
-  }
+
   override def get(id: TimeSpan): Try[Option[PeriodicUsage]] = Try {
     val s = statement(selectWithTimeSpan)
 
