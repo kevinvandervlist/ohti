@@ -15,13 +15,15 @@ object MonitoringDataValue {
       case (v, i) =>
         val s = md.dateStart.add(i * md.interval, ChronoUnit.MINUTES)
         val e = s.add(md.interval, ChronoUnit.MINUTES)
-        val mdi = MonitoringDataIndex(md.deviceId, s.asTimeStamp, e.asTimeStamp)
-        MonitoringDataValue(mdi, v, md.dataUnit.toString)
+        val mdi = MonitoringDataIndex(md.deviceId, s.asTimeStamp, e.asTimeStamp, md.category.toString, md.dataUnit.toString)
+        MonitoringDataValue(mdi, v)
     }
 }
 
 case class MonitoringDataIndex(deviceUUID: UUID,
                                from: Long,
-                               to: Long)
+                               to: Long,
+                               category: String,
+                               unit: String)
 
-case class MonitoringDataValue(index: MonitoringDataIndex, value: BigDecimal, unit: String)
+case class MonitoringDataValue(index: MonitoringDataIndex, value: BigDecimal)

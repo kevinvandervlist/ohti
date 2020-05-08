@@ -3,7 +3,7 @@ package nl.kevinvandervlist.ohti.repository.data
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-import nl.kevinvandervlist.ohti.api.model.{CO2, IthoZonedDateTime, MonitoringData}
+import nl.kevinvandervlist.ohti.api.model.{CO2, IthoZonedDateTime, MonitoringData, PartsPerMillion}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
@@ -11,7 +11,7 @@ import scala.language.implicitConversions
 
 class MonitoringDataSpec extends AnyWordSpec with Matchers {
   private val now = IthoZonedDateTime.fromPortalString("2020-05-07T00:00:00")
-  private val md = MonitoringData(UUID.randomUUID(), CO2, now, 15, now, List(
+  private val md = MonitoringData(UUID.randomUUID(), PartsPerMillion, CO2, now, 15, now, List(
     None,
     Some(BigDecimal(1)),
     Some(BigDecimal(2.5))
@@ -29,22 +29,28 @@ class MonitoringDataSpec extends AnyWordSpec with Matchers {
           MonitoringDataIndex(
             md.deviceId,
             now.add(0, ChronoUnit.MINUTES),
-            now.add(15, ChronoUnit.MINUTES)
-          ), null, "CO2"
+            now.add(15, ChronoUnit.MINUTES),
+            "PartsPerMillion",
+            "CO2"
+          ), null
         ),
         MonitoringDataValue(
           MonitoringDataIndex(
             md.deviceId,
             now.add(15, ChronoUnit.MINUTES),
-            now.add(30, ChronoUnit.MINUTES)
-          ), BigDecimal(1), "CO2"
+            now.add(30, ChronoUnit.MINUTES),
+            "PartsPerMillion",
+            "CO2"
+          ), BigDecimal(1)
         ),
         MonitoringDataValue(
           MonitoringDataIndex(
             md.deviceId,
             now.add(30, ChronoUnit.MINUTES),
-            now.add(45, ChronoUnit.MINUTES)
-          ), BigDecimal(2.5), "CO2"
+            now.add(45, ChronoUnit.MINUTES),
+            "PartsPerMillion",
+            "CO2"
+          ), BigDecimal(2.5)
         )
       )
     }

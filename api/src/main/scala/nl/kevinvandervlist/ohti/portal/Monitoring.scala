@@ -24,11 +24,28 @@ object Monitoring {
     }
   }
 
+  implicit val decodeCategory: Decoder[Category] = new Decoder[Category] {
+    final def apply(c: HCursor): Decoder.Result[Category] = for {
+      u <- c.as[Int]
+    } yield {
+      u match {
+        case 100 => ActualTemperatureCelcius
+        case 110 => ConfiguredTemperatureCelcius
+        case 70 => PartsPerMillion
+        case 80 => FanSpeedPercentage
+        case 20 => CentralMeterGasUsage
+        case 12 => DinRailElectricityMeter
+        case 11 => CentralMeterElectricityUsage
+      }
+    }
+  }
+
   case class HackMixedDoubleAndStrings(s: String)
 
   implicit val decodeMonitoringData: Decoder[MonitoringData] = new Decoder[MonitoringData] {
     final def apply(c: HCursor): Decoder.Result[MonitoringData] = for {
       id <- c.downField("deviceId").as[String]
+      category <- c.downField("category").as[Category]
       unit <- c.downField("dataUnit").as[DataUnit]
       start <- c.downField("dateStart").as[Long]
       ts <- c.downField("timeStamp").as[Long]
@@ -36,7 +53,7 @@ object Monitoring {
       data <- c.downField("data").as[List[HackMixedDoubleAndStrings]](Decoder.decodeList(dataDecoder))
     } yield {
       def bd(d: HackMixedDoubleAndStrings): Option[BigDecimal] = if(d.s == "NaN") { None } else { Some(BigDecimal(d.s)) }
-      MonitoringData(UUID.fromString(id), unit, IthoZonedDateTime.fromTimeStamp(start), interval, IthoZonedDateTime.fromTimeStamp(ts), data.map(bd))
+      MonitoringData(UUID.fromString(id), category, unit, IthoZonedDateTime.fromTimeStamp(start), interval, IthoZonedDateTime.fromTimeStamp(ts), data.map(bd))
     }
   }
 

@@ -21,9 +21,10 @@ class MonitoringDataRepositoryImpl(protected val connection: Connection) extends
       |  uuid TEXT NOT NULL,
       |  [from] INTEGER NOT NULL,
       |  [to] INTEGER NOT NULL,
-      |  value TEXT,
+      |  category TEXT,
       |  unit TEXT,
-      |  PRIMARY KEY (uuid, [from], [to])
+      |  value TEXT,
+      |  PRIMARY KEY (uuid, [from], [to], category, unit)
       |);
       |""".stripMargin
 
@@ -32,15 +33,17 @@ class MonitoringDataRepositoryImpl(protected val connection: Connection) extends
       |  uuid,
       |  [from],
       |  [to],
-      |  value,
-      |  unit
-      |) VALUES (?, ?, ?, ?, ?)
-      |ON CONFLICT(uuid, [from], [to]) DO UPDATE SET
+      |  category,
+      |  unit,
+      |  value
+      |) VALUES (?, ?, ?, ?, ?, ?)
+      |ON CONFLICT(uuid, [from], [to], category, unit) DO UPDATE SET
       |  uuid=excluded.uuid,
       |  [from]=excluded.[from],
       |  [to]=excluded.[to],
-      |  value=excluded.value,
-      |  unit=excluded.unit
+      |  category=excluded.category,
+      |  unit=excluded.unit,
+      |  value=excluded.value
       |;
       |""".stripMargin
 
@@ -49,9 +52,10 @@ class MonitoringDataRepositoryImpl(protected val connection: Connection) extends
        |  uuid,
        |  [from],
        |  [to],
-       |  value,
-       |  unit
-       |FROM monitoring_data WHERE uuid = ? AND [from] = ? AND [to] = ?;
+       |  category,
+       |  unit,
+       |  value
+       |FROM monitoring_data WHERE uuid = ? AND [from] = ? AND [to] = ? AND category = ? AND unit = ?;
        |""".stripMargin
 
   override def get(id: MonitoringDataIndex): Try[Option[MonitoringDataValue]] = Try {
@@ -60,6 +64,8 @@ class MonitoringDataRepositoryImpl(protected val connection: Connection) extends
     s.setString(1, id.deviceUUID.toString)
     s.setLong(2, id.from)
     s.setLong(3, id.to)
+    s.setString(4, id.category)
+    s.setString(5, id.unit)
 
     val rs = s.executeQuery()
     val result: Option[MonitoringDataValue] = if(rs.next()) {
@@ -67,14 +73,15 @@ class MonitoringDataRepositoryImpl(protected val connection: Connection) extends
         MonitoringDataIndex(
           UUID.fromString(rs.getString(1)),
           rs.getLong(2),
-          rs.getLong(3)
+          rs.getLong(3),
+          rs.getString(4),
+          rs.getString(5)
         ),
-        if(rs.getString(4) == null) {
+        if(rs.getString(6) == null) {
           null
         } else {
-          BigDecimal(rs.getString(4))
-        },
-        rs.getString(5)
+          BigDecimal(rs.getString(6))
+        }
       ))
     } else {
       None
@@ -92,9 +99,10 @@ class MonitoringDataRepositoryImpl(protected val connection: Connection) extends
       s.setString(1, item.index.deviceUUID.toString)
       s.setLong(2, item.index.from)
       s.setLong(3, item.index.to)
+      s.setString(4, item.index.category)
+      s.setString(5, item.index.unit)
 
-      s.setString(4, if (item.value == null) null else String.valueOf(item.value))
-      s.setString(5, item.unit)
+      s.setString(6, if (item.value == null) null else String.valueOf(item.value))
 
       s.addBatch()
     }
