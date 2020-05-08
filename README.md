@@ -17,12 +17,18 @@ See [here](https://tweakers.net/productreview/212044/itho-daalderop-spider-conne
 ```
 $ java -Dconfig.file=application.conf -Dlogback.configurationFile=./logback.xml -jar ohti.jar help
 09:50:42.145 [main] ERROR nl.kevinvandervlist.ohti.main.Main$ - Available tasks are:
-09:50:42.149 [main] ERROR nl.kevinvandervlist.ohti.main.Main$ - * list-devices
-09:50:42.149 [main] ERROR nl.kevinvandervlist.ohti.main.Main$ - * usage-details
 09:50:42.149 [main] ERROR nl.kevinvandervlist.ohti.main.Main$ - * daily-aggregate-sqlite
+09:50:42.149 [main] ERROR nl.kevinvandervlist.ohti.main.Main$ - * catchup-daily-aggregate-sqlite
+09:50:42.149 [main] ERROR nl.kevinvandervlist.ohti.main.Main$ - * detailed-data-sqlite
 $ java -Dconfig.file=application.conf -Dlogback.configurationFile=./logback.xml -jar ohti.jar daily-aggregate-sqlite
 [...]
+# Daily aggregated power information, with precalculated summaries
 $ sqlite3 daily-aggregate.sqlite 'SELECT name,producedPower,compensatedPowerBalance,gasUsage FROM periodic_usage ORDER BY name DESC LIMIT 2;'
 2020-04-22|27800.100070524|-19292.999969|0.5025
 2020-04-21|27845.599906324|-20527.999985|0.3125
+# 15-minute interval raw monitoring data, logged for all devices
+$ sqlite3 detailed-data.sqlite 'SELECT * from monitoring_data LIMIT 3;'
+70b4058a-0e98-4ecb-be3c-f52a6626944c|1588802400000|1588803300000|CentralMeterGasUsage|m3|0.0
+70b4058a-0e98-4ecb-be3c-f52a6626944c|1588803300000|1588804200000|CentralMeterGasUsage|m3|0.0
+70b4058a-0e98-4ecb-be3c-f52a6626944c|1588804200000|1588805100000|CentralMeterGasUsage|m3|0.0
 ```
