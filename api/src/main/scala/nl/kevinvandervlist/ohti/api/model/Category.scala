@@ -28,11 +28,11 @@ case object CentralMeterGasUsage extends Category {
 }
 
 // 12
-case object DinRailElectricityMeter extends Category {
-  override def toString: String = "DinRailElectricityMeter"
+case object ElectricityProduction extends Category {
+  override def toString: String = "ElectricityProduction"
 }
 
 // 11
-case object CentralMeterElectricityUsage extends Category {
-  override def toString: String = "CentralMeterElectricityUsage"
+case object ElectricityUsage extends Category {
+  override def toString: String = "ElectricityUsage"
 }

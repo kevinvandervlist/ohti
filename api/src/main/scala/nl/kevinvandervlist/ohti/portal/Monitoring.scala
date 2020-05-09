@@ -34,8 +34,8 @@ object Monitoring {
         case 70 => PartsPerMillion
         case 80 => FanSpeedPercentage
         case 20 => CentralMeterGasUsage
-        case 12 => DinRailElectricityMeter
-        case 11 => CentralMeterElectricityUsage
+        case 12 => ElectricityProduction
+        case 11 => ElectricityUsage
       }
     }
   }
