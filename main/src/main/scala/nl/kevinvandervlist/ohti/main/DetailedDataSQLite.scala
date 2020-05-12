@@ -20,7 +20,7 @@ object DetailedDataSQLite extends RunnableTask with LazyLogging {
 
   override def apply(api: PortalAPI, settings: Settings)(implicit ec: ExecutionContext): Unit = {
     val cfg = settings.taskConfig(name)
-    // We gather all uuids from all knows devices
+    // We gather all uuids from all known devices
     val ids: Future[List[UUID]] = for {
       eds <- api.energyDevices()
       zs <- api.zones()
