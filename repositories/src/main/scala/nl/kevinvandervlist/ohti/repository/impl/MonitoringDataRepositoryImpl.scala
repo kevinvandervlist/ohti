@@ -94,6 +94,11 @@ class MonitoringDataRepositoryImpl(protected val connection: Connection) extends
     put(List(item)).map(_.head)
 
   override def put(items: List[MonitoringDataValue]): Try[List[MonitoringDataValue]] = Try {
+    for(q <- List("PRAGMA synchronous = OFF", "PRAGMA journal_mode = MEMORY")) {
+      val preperatoryStatement = connection.createStatement()
+      preperatoryStatement.execute(q)
+      preperatoryStatement.close()
+    }
     val s = statement(upsert)
     items foreach { item =>
       s.setString(1, item.index.deviceUUID.toString)
