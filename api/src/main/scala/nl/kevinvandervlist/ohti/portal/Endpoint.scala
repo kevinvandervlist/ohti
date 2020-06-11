@@ -13,4 +13,6 @@ case class Endpoint(private val baseURL: String) {
   }
 
   def zones: Uri = uri"$baseURL/api/zones"
+
+  def schedule(uuid: String): Uri = uri"https://mijn.ithodaalderop.nl/api/schedules/$uuid"
 }

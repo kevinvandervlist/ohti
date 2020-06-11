@@ -39,6 +39,13 @@ trait PortalAPI {
    * @return
    */
   def zones(): Future[Zones]
+  /**
+   * Retrieve a schedule for a given device
+   *
+   * @param uuid The UUID of the device that has a schedule
+   * @return The schedule of a device
+   */
+  def schedule(uuid: UUID): Future[Schedule]
   /** Stop this portal API instance (destructor) */
   def stop(): Unit = ()
 

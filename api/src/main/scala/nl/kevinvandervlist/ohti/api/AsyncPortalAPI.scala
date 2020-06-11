@@ -2,14 +2,14 @@ package nl.kevinvandervlist.ohti.api
 
 import java.util.UUID
 
-import nl.kevinvandervlist.ohti.api.model.{IthoZonedDateTime, MonitoringData}
+import nl.kevinvandervlist.ohti.api.model.{IthoZonedDateTime, MonitoringData, Schedule}
 import nl.kevinvandervlist.ohti.portal.TokenManager.{TokenProvider, TokenResponse}
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 import java.util.concurrent.{ScheduledExecutorService, _}
 
 import com.typesafe.scalalogging.LazyLogging
-import nl.kevinvandervlist.ohti.portal.{Endpoint, EnergyDevices, Monitoring, TokenManager, Zones}
+import nl.kevinvandervlist.ohti.portal.{Endpoint, EnergyDevices, Monitoring, Schedules, TokenManager, Zones}
 import sttp.client.{Identity, NothingT, SttpBackend}
 
 private[api] class AsyncPortalAPI(username: String, password: String)
@@ -39,6 +39,7 @@ private[api] class AsyncPortalAPI(username: String, password: String)
   private val energyDevicesFeature = new EnergyDevices()
   private val monitoringFeature = new Monitoring()
   private val zonesFeature = new Zones()
+  private val schedulesFeature = new Schedules()
 
   override def stop(): Unit = try {
     scheduledRefresh.map(_.cancel(true))
@@ -102,5 +103,15 @@ private[api] class AsyncPortalAPI(username: String, password: String)
     logFailure(zonesFeature.retrieveZones(),
       "Retrieving zones succeeded, but no valid response found."
     ) getOrElse nl.kevinvandervlist.ohti.api.model.Zones(List.empty)
+  }
+
+  override def schedule(uuid: UUID): Future[Schedule] = Future {
+    val msg = s"Retrieving schedule for $uuid succeeded, but it is not present"
+    logFailure(schedulesFeature.retrieveSchedule(uuid),
+      msg
+    ) match {
+      case Some(result) => result
+      case None => throw new NoSuchElementException(msg)
+    }
   }
 }
