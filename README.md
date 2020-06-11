@@ -8,6 +8,8 @@ See [here](https://tweakers.net/productreview/212044/itho-daalderop-spider-conne
 ## My usecase
 * A more meaningful portal that -- in one glance -- show's me all the information I'm interested in. 
 * An (easy) way to export data from the portal, so the data is not locked in the online environment. 
+* The payloads are very verbose, contain a lot of repetitive info and sometimes unused or in my view irrelevant info. 
+I'll drop these parts of the payload _unless_ there is a usecase for it. 
 
 ## Future work
 * Implement more of the API (compared to just what I personally need).
