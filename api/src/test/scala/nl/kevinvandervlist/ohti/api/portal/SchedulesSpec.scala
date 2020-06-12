@@ -22,7 +22,7 @@ class SchedulesSpec extends AnyWordSpec with Matchers {
       |  "scheduledProperties":[
       |    {"id":"FanSpeed","scheduleChoices":[
       |      {"label":"-","value":"Away","disabled":false,"moments":[],"overrideUntil":0},
-      |      {"label":"1","value":"Low","disabled":false,"moments":[],"overrideUntil":0},
+      |      {"label":"1","value":"Low","disabled":false,"moments":null,"overrideUntil":0},
       |      {"label":"2","value":"Medium","disabled":false,"moments":[],"overrideUntil":0},
       |      {"label":"3","value":"High","disabled":false,"moments":[],"overrideUntil":0},
       |      {"label":"A","value":"Auto","disabled":false,"moments":[],"overrideUntil":0}

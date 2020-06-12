@@ -3,13 +3,12 @@ package nl.kevinvandervlist.ohti.portal
 import java.time.DayOfWeek
 import java.util.UUID
 
-import io.circe.{Decoder, HCursor}
+import io.circe.{Decoder, Encoder, HCursor, Json}
 import nl.kevinvandervlist.ohti.api.model.{Moment, Schedule, ScheduledChoice, ScheduledDevice, ScheduledProperty}
 import nl.kevinvandervlist.ohti.portal.TokenManager._
 import nl.kevinvandervlist.ohti.portal.Schedules._
 import sttp.client._
 import sttp.client.circe._
-
 
 object Schedules {
   implicit val decodeSchedule: Decoder[Schedule] = new Decoder[Schedule] {
@@ -45,10 +44,24 @@ object Schedules {
       lbl <- c.downField("label").as[String]
       value <- c.downField("value").as[String]
       disabled <- c.downField("disabled").as[Boolean]
-      moments <- c.downField("moments").as[List[Moment]]
+      moments <- c.downField("moments").as[Option[List[Moment]]]
+      overrideUntil <- c.downField("overrideUntil").as[Long]
     } yield {
-      ScheduledChoice(lbl, value, disabled, moments)
+      ScheduledChoice(lbl, value, disabled, moments, overrideUntil)
     }
+  }
+
+  implicit val encodeScheduledChoice: Encoder[ScheduledChoice] = new Encoder[ScheduledChoice] {
+    override def apply(a: ScheduledChoice): Json = Json.obj(
+      ("label", Json.fromString(a.label)),
+      ("value", Json.fromString(a.value)),
+      ("disabled", Json.fromBoolean(a.isDisabled)),
+      ("moments", a.moments match {
+        case Some(m) => Json.arr(m.map(encodeMoment.apply): _*)
+        case None => Json.Null
+      }),
+      ("overrideUntil", Json.fromLong(a.overrideUntil)),
+    )
   }
 
   implicit val decodeMoment: Decoder[Moment] = new Decoder[Moment] {
@@ -58,6 +71,13 @@ object Schedules {
     } yield {
       Moment(day, time)
     }
+  }
+
+  implicit val encodeMoment: Encoder[Moment] = new Encoder[Moment] {
+    override def apply(a: Moment): Json = Json.obj(
+      ("day", encodeDayOfWeek(a.day)),
+      ("time", Json.fromLong(a.time))
+    )
   }
 
   implicit val decodeDayOfWeek: Decoder[DayOfWeek] = new Decoder[DayOfWeek] {
@@ -74,6 +94,10 @@ object Schedules {
         case 6 => DayOfWeek.SUNDAY
       }
     }
+  }
+
+  implicit val encodeDayOfWeek: Encoder[DayOfWeek] = new Encoder[DayOfWeek] {
+    override def apply(a: DayOfWeek): Json = Json.fromInt(a.getValue - 1) // - 1 b/c iso8601
   }
 }
 

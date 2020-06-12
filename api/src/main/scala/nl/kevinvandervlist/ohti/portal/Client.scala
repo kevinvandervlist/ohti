@@ -14,6 +14,10 @@ trait Client[T] extends LazyLogging {
   }
 
   def handle(msg: String, response: Identity[Response[Either[ResponseError[circe.Error], T]]]): Option[T] = {
+    if(response.code.isSuccess && response.body.isLeft) {
+      logger.error("JSON mapping error: {}", response.body)
+      return None
+    }
     if(response.code.isSuccess) {
       response.body.toOption
     } else {

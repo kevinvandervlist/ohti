@@ -9,6 +9,6 @@ case class ScheduledDevice(id: UUID, isActive: Boolean)
 
 case class ScheduledProperty(id: String, choices: List[ScheduledChoice])
 
-case class ScheduledChoice(label: String, value: String, isDisabled: Boolean, moments: List[Moment])
+case class ScheduledChoice(label: String, value: String, isDisabled: Boolean, moments: Option[List[Moment]], overrideUntil: Long)
 
 case class Moment(day: DayOfWeek, time: Long)
