@@ -197,9 +197,9 @@ class DevicesSpec extends AnyWordSpec with Matchers {
       |            "overrideUntil":0
       |          }
       |        ],
-      |        "max":100.00,
+      |        "max":100.0,
       |        "min":0.0,
-      |        "step":0.50,
+      |        "step":0.5,
       |        "label":"AirQuality",
       |        "type":"rangeproperty",
       |        "typeCustom":"rangeproperty",
@@ -223,9 +223,9 @@ class DevicesSpec extends AnyWordSpec with Matchers {
       |            "overrideUntil":0
       |          }
       |        ],
-      |        "max":100.00,
+      |        "max":100.0,
       |        "min":0.0,
-      |        "step":1.00,
+      |        "step":1.0,
       |        "label":"ExhaustFanSpeed",
       |        "type":"rangeproperty",
       |        "typeCustom":"rangeproperty",
@@ -249,9 +249,9 @@ class DevicesSpec extends AnyWordSpec with Matchers {
       |            "overrideUntil":0
       |          }
       |        ],
-      |        "max":32767.00,
+      |        "max":32767.0,
       |        "min":0.0,
-      |        "step":1.00,
+      |        "step":1.0,
       |        "label":"CO2",
       |        "type":"rangeproperty",
       |        "typeCustom":"rangeproperty",
@@ -275,9 +275,9 @@ class DevicesSpec extends AnyWordSpec with Matchers {
       |            "overrideUntil":0
       |          }
       |        ],
-      |        "max":100.00,
+      |        "max":100.0,
       |        "min":0.0,
-      |        "step":1.00,
+      |        "step":1.0,
       |        "label":"ZoneDemand",
       |        "type":"rangeproperty",
       |        "typeCustom":"rangeproperty",
@@ -301,9 +301,9 @@ class DevicesSpec extends AnyWordSpec with Matchers {
       |            "overrideUntil":0
       |          }
       |        ],
-      |        "max":50.00,
-      |        "min":-10.00,
-      |        "step":0.50,
+      |        "max":50.0,
+      |        "min":-10.0,
+      |        "step":0.5,
       |        "label":"Huidige temperatuur",
       |        "type":"rangeproperty",
       |        "typeCustom":"rangeproperty",
@@ -327,9 +327,9 @@ class DevicesSpec extends AnyWordSpec with Matchers {
       |            "overrideUntil":0
       |          }
       |        ],
-      |        "max":30.00,
-      |        "min":10.00,
-      |        "step":0.50,
+      |        "max":30.0,
+      |        "min":10.0,
+      |        "step":0.5,
       |        "label":"Temperatuur",
       |        "type":"rangeproperty",
       |        "typeCustom":"rangeproperty-temperature",
