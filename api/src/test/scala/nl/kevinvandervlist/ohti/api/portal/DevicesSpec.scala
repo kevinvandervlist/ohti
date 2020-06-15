@@ -371,5 +371,18 @@ class DevicesSpec extends AnyWordSpec with Matchers {
       val device = new nl.kevinvandervlist.ohti.portal.Device().updateDevice(dev)
       device.isDefined shouldBe true
     }
+    "Test a full JSON Decoding/Encoding cycle" in {
+      import nl.kevinvandervlist.ohti.portal.Devices._
+      import io.circe.syntax._
+      import io.circe.parser.decode
+
+      decode[List[Device]](allDevices).map(_.asJson) match {
+        case Left(e) => fail(e)
+        case Right(json) =>
+        println(json)
+        println(allDevices)
+          json.toString().replaceAll("\\s", "") shouldBe allDevices.replaceAll("\\s", "")
+      }
+    }
   }
 }

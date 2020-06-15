@@ -2,7 +2,7 @@ package nl.kevinvandervlist.ohti.portal
 
 import java.util.UUID
 
-import io.circe.{Decoder, Encoder, HCursor, Json}
+import io.circe.{ACursor, Decoder, Encoder, HCursor, Json}
 import nl.kevinvandervlist.ohti.api.model
 import nl.kevinvandervlist.ohti.api.model.{DeviceProperty, ScheduledChoice}
 import nl.kevinvandervlist.ohti.portal.TokenManager._
@@ -59,7 +59,7 @@ object Devices {
       ("manufacturer", Json.fromString(a.manufacturer)),
       ("properties", Json.arr(a.properties.map(encodeDeviceProperty.apply): _*)),
       ("parameters", Json.obj(a.parameters.toList.map { case (k, v) => (k, Json.fromString(v)) }: _*)),
-      ("_etag", Json.fromLong(a._etag)),
+      ("_etag", Json.fromString(a._etag.toString)),
       ("bdrSetting", Json.fromInt(a.bdrSetting)),
     )
   }
@@ -68,6 +68,9 @@ object Devices {
     final def apply(c: HCursor): Decoder.Result[DeviceProperty] = for {
       // scheduleChoices can be missing completely!
       choices <- c.downField("scheduleChoices").as[Option[List[ScheduledChoice]]]
+      max <- c.downField("max").as[Option[Double]]
+      min <- c.downField("min").as[Option[Double]]
+      step <- c.downField("step").as[Option[Double]]
       label <- c.downField("label").as[String]
       tpe <- c.downField("type").as[String]
       typeCustom <- c.downField("typeCustom").as[String]
@@ -76,12 +79,16 @@ object Devices {
       status <- c.downField("status").as[Option[String]]
       canControl <- c.downField("canControl").as[Boolean]
       hasLogging <- c.downField("hasLogging").as[Boolean]
+      hasSchedule <- c.downField("hasSchedule").as[Boolean]
       hasStatus <- c.downField("hasStatus").as[Boolean]
       isAvailable <- c.downField("isAvailable").as[Boolean]
       statusLastUpdated <- c.downField("statusLastUpdated").as[Option[String]]
     } yield {
       DeviceProperty(
         choices,
+        max,
+        min,
+        step,
         label,
         tpe,
         typeCustom,
@@ -90,12 +97,26 @@ object Devices {
         status,
         canControl,
         hasLogging,
+        hasSchedule,
         hasStatus,
         isAvailable,
         statusLastUpdated
       )
     }
-  }
+  }.prepare((c: ACursor) => {
+    // This is really hacky. The min/max/step keys can be optionally present,
+    // but if they are present they are doubles. So we prepare by including them with
+    // null if they are not defined...
+    c.withFocus(json => {
+      json.mapObject(obj => {
+        List("max", "min", "step")
+          .foldLeft(obj) {
+            case (o, k) if o.contains(k) => o
+            case (o, k) => o.add(k, Json.Null)
+          }
+      })
+    })
+  })
 
   implicit val encodeDeviceProperty: Encoder[DeviceProperty] = new Encoder[DeviceProperty] {
     override def apply(a: DeviceProperty): Json = {
@@ -105,7 +126,15 @@ object Devices {
         case Some(c) => List("scheduleChoices" -> Json.arr(c.map(encodeScheduledChoice.apply): _*))
         case None => List.empty
       }
-      Json.obj(sched ++ List(
+      // These three should only be created when they are set
+      val minMaxStep: List[(String, Json)] = List(
+        ("max", a.max.map(Json.fromDouble)),
+        ("min", a.min.map(Json.fromDouble)),
+        ("step", a.step.map(Json.fromDouble)),
+      ).collect {
+        case (k, Some(Some(j))) => k -> j
+      }
+      Json.obj(sched ++ minMaxStep ++ List(
         ("label", Json.fromString(a.label)),
         ("type", Json.fromString(a.`type`)),
         ("typeCustom", Json.fromString(a.typeCustom)),
@@ -117,6 +146,7 @@ object Devices {
         }),
         ("canControl", Json.fromBoolean(a.canControl)),
         ("hasLogging", Json.fromBoolean(a.hasLogging)),
+        ("hasSchedule", Json.fromBoolean(a.hasSchedule)),
         ("hasStatus", Json.fromBoolean(a.hasStatus)),
         ("isAvailable", Json.fromBoolean(a.isAvailable)),
         ("statusLastUpdated", a.statusLastUpdated match {

@@ -15,6 +15,9 @@ case class Device(`type`: Int,
                   bdrSetting: Int)
 
 case class DeviceProperty(scheduleChoices: Option[List[ScheduledChoice]],
+                          max: Option[Double],
+                          min: Option[Double],
+                          step: Option[Double],
                           label: String,
                          `type`: String,
                           typeCustom: String,
@@ -23,6 +26,7 @@ case class DeviceProperty(scheduleChoices: Option[List[ScheduledChoice]],
                           status: Option[String],
                           canControl: Boolean,
                           hasLogging: Boolean,
+                          hasSchedule: Boolean,
                           hasStatus: Boolean,
                           isAvailable: Boolean,
                           statusLastUpdated: Option[String])
