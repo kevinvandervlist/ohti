@@ -14,7 +14,7 @@ fi
 
 sbt ${SBT_ARGS} clean compile assembly 'show assembly'
 
-cp main/target/scala-2.13/main-assembly-0.0.1-SNAPSHOT.jar ${TARGET_DIR}/ohti.jar
+cp main/target/scala-2.13/main-assembly-*.jar ${TARGET_DIR}/ohti.jar
 cp main/src/main/resources/reference.conf ${TARGET_DIR}/application.conf
 cp main/src/main/resources/logback.xml ${TARGET_DIR}/logback.xml
 

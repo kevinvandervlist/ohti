@@ -45,6 +45,7 @@ object Main extends App with LazyLogging {
   }
 
   private def help(): Unit = {
+    logger.error(s"ohti version ${getClass.getPackage.getImplementationVersion}")
     logger.error("Available tasks are:")
     for(n <- tasks.keys) {
       logger.error(s"* $n")
