@@ -8,6 +8,7 @@ See [here](https://tweakers.net/productreview/212044/itho-daalderop-spider-conne
 ## My usecase
 * A more meaningful portal that -- in one glance -- show's me all the information I'm interested in. 
 * An (easy) way to export data from the portal, so the data is not locked in the online environment. 
+* A more accessible platform by providing an API implementation for JVM languages such as Scala, Java or Kotlin. 
 * The payloads are very verbose, contain a lot of repetitive info and sometimes unused or in my view irrelevant info. 
 I'll drop these parts of the payload _unless_ there is a usecase for it. 
 
@@ -18,10 +19,34 @@ I'll drop these parts of the payload _unless_ there is a usecase for it.
 
 ```
 $ java -Dconfig.file=application.conf -Dlogback.configurationFile=./logback.xml -jar ohti.jar help
-09:50:42.145 [main] ERROR nl.kevinvandervlist.ohti.main.Main$ - Available tasks are:
-09:50:42.149 [main] ERROR nl.kevinvandervlist.ohti.main.Main$ - * daily-aggregate-sqlite
-09:50:42.149 [main] ERROR nl.kevinvandervlist.ohti.main.Main$ - * catchup-daily-aggregate-sqlite
-09:50:42.149 [main] ERROR nl.kevinvandervlist.ohti.main.Main$ - * detailed-data-sqlite
+19:29:28.296 [main] ERROR nl.kevinvandervlist.ohti.main.Main$ - Available tasks are:
+19:29:28.308 [main] ERROR nl.kevinvandervlist.ohti.main.Main$ - * enable-cooling-mode
+19:29:28.309 [main] ERROR nl.kevinvandervlist.ohti.main.Main$ - * disable-cooling-mode
+19:29:28.309 [main] ERROR nl.kevinvandervlist.ohti.main.Main$ - * catchup-detailed-data-sqlite
+19:29:28.309 [main] ERROR nl.kevinvandervlist.ohti.main.Main$ - * catchup-daily-aggregate-sqlite
+19:29:28.309 [main] ERROR nl.kevinvandervlist.ohti.main.Main$ - * detailed-data-sqlite
+19:29:28.309 [main] ERROR nl.kevinvandervlist.ohti.main.Main$ - * daily-aggregate-sqlite
+```
+
+### Enabling or disable cooling mode
+If you have a device that supports cooling (such as [HP Cool Cube warmtepomp](https://www.ithodaalderop.nl/nl-NL/professional/product/07-40-50-400)), you can enable or disable the cooling mode automatically.
+For example, this can be useful if you want to be able to optimize consumption of privately generated solar energy. 
+
+```
+$ java -Dconfig.file=application.conf -Dlogback.configurationFile=./logback.xml -jar ohti.jar disable-cooling-mode
+[...]
+14:43:31.104 [main] INFO  nl.kevinvandervlist.ohti.main.Main$ - Executing task disable-cooling-mode
+14:43:32.000 [main] INFO  n.k.ohti.main.DisableCoolingMode$ - Successfully updated device <uuid>: cooling is now disabled
+14:43:32.000 [main] INFO  nl.kevinvandervlist.ohti.main.Main$ - Completed task disable-cooling-mode
+14:43:32.001 [main] INFO  n.k.ohti.api.AsyncPortalAPI - Stopping pool...
+```
+### Extracting monitoring data from the mijn itho daalderop portal
+If you want export all monitoring data from the online portal, for example for offline analysis, this is also possible. 
+There are two modes: one exporting daily aggregates containing precomputing data (e.g. own consumption based on feedback and raw solar energy production). 
+The other mode will just export _all_ monitoring data from a given device, in a given resolution for a given timespan. 
+Note that there is a limit of 15 minute windows -- higher precision is either not stored, or not exposed by Fifthplay. 
+
+```
 $ java -Dconfig.file=application.conf -Dlogback.configurationFile=./logback.xml -jar ohti.jar daily-aggregate-sqlite
 [...]
 # Daily aggregated power information, with precalculated summaries
