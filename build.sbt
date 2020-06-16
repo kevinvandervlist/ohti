@@ -16,7 +16,7 @@ lazy val commonSettings = Seq(
   ),
   libraryDependencies ++= Seq(
     "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
-    "org.scalatest" %% "scalatest" % "3.1.1" % "test"
+    "org.scalatest" %% "scalatest" % "3.1.2" % "test"
   ),
   // Skip tests in assembly
   test in assembly := {},
@@ -27,10 +27,9 @@ lazy val api = (project in file("api")).
   settings(
     name := "api",
     libraryDependencies ++= Seq(
-      "io.reactivex.rxjava3" % "rxjava" % "3.0.2",
-      "com.softwaremill.sttp.client" %% "core" % "2.0.9",
-      "com.softwaremill.sttp.client" %% "circe" % "2.0.9",
-      "com.softwaremill.sttp.client" %% "slf4j-backend" % "2.0.9",
+      "com.softwaremill.sttp.client" %% "core" % "2.2.0",
+      "com.softwaremill.sttp.client" %% "circe" % "2.2.0",
+      "com.softwaremill.sttp.client" %% "slf4j-backend" % "2.2.0",
       "io.circe" %% "circe-optics" % "0.13.0"
     ),
   ).settings(
@@ -42,7 +41,7 @@ lazy val repositories = (project in file("repositories")).
   settings(
     name := "repositories",
     libraryDependencies ++= Seq(
-      "org.xerial" % "sqlite-jdbc" % "3.30.1"
+      "org.xerial" % "sqlite-jdbc" % "3.31.1"
     ),
   ).settings(
     assemblyJarName in assembly := "repositories.jar",
