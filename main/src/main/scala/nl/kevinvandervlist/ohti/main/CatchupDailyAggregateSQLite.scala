@@ -1,7 +1,5 @@
 package nl.kevinvandervlist.ohti.main
 
-import java.time.temporal.ChronoUnit
-
 import com.typesafe.scalalogging.LazyLogging
 import nl.kevinvandervlist.ohti.api.PortalAPI
 import nl.kevinvandervlist.ohti.api.model.IthoZonedDateTime
