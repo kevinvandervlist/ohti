@@ -60,7 +60,27 @@ trait PortalAPI {
    */
   def monitoringData(interval: Int, uuid: UUID, measurementCount: Int, start: IthoZonedDateTime): Future[List[MonitoringData]]
 
+  /** Retrieve all devices registered with this account
+   *
+   * @return All monitoring devices
+   */
+  def retrieveDevices(): Future[List[nl.kevinvandervlist.ohti.api.model.Device]]
+
+  /** Retrieve details of a specific monitoring device
+   *
+   * @param uuid The UUID of the monitoring device
+   * @return All details of the monitoring device
+   */
+  def retrieveDevice(uuid: UUID): Future[nl.kevinvandervlist.ohti.api.model.Device]
+
   /**
+   * Given a device, update it in the Portal
+   * @param dev The device that needs to be updated
+   * @return The updated device
+   */
+  def updateDevice(dev: nl.kevinvandervlist.ohti.api.model.Device): Future[nl.kevinvandervlist.ohti.api.model.Device]
+
+    /**
    * Retrieve daily data for a given device and moment (will automatically start at the beginning of the day).
    * This is equivalent to the web portal 'day' option.
    */

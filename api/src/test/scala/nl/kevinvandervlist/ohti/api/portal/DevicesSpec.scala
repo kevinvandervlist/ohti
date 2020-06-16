@@ -379,8 +379,6 @@ class DevicesSpec extends AnyWordSpec with Matchers {
       decode[List[Device]](allDevices).map(_.asJson) match {
         case Left(e) => fail(e)
         case Right(json) =>
-        println(json)
-        println(allDevices)
           json.toString().replaceAll("\\s", "") shouldBe allDevices.replaceAll("\\s", "")
       }
     }

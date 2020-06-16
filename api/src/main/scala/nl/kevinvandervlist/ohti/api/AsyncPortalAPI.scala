@@ -2,14 +2,14 @@ package nl.kevinvandervlist.ohti.api
 
 import java.util.UUID
 
-import nl.kevinvandervlist.ohti.api.model.{IthoZonedDateTime, MonitoringData, Schedule}
+import nl.kevinvandervlist.ohti.api.model.{Device, IthoZonedDateTime, MonitoringData, Schedule}
 import nl.kevinvandervlist.ohti.portal.TokenManager.{TokenProvider, TokenResponse}
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 import java.util.concurrent.{ScheduledExecutorService, _}
 
 import com.typesafe.scalalogging.LazyLogging
-import nl.kevinvandervlist.ohti.portal.{Endpoint, EnergyDevices, Monitoring, Schedules, TokenManager, Zones}
+import nl.kevinvandervlist.ohti.portal.{Devices, Endpoint, EnergyDevices, Monitoring, Schedules, TokenManager, Zones}
 import sttp.client.{Identity, NothingT, SttpBackend}
 
 private[api] class AsyncPortalAPI(username: String, password: String)
@@ -40,6 +40,8 @@ private[api] class AsyncPortalAPI(username: String, password: String)
   private val monitoringFeature = new Monitoring()
   private val zonesFeature = new Zones()
   private val schedulesFeature = new Schedules()
+  private val devicesFeature = new Devices()
+  private val deviceFeature = new nl.kevinvandervlist.ohti.portal.Device()
 
   override def stop(): Unit = try {
     scheduledRefresh.map(_.cancel(true))
@@ -108,6 +110,36 @@ private[api] class AsyncPortalAPI(username: String, password: String)
   override def schedule(uuid: UUID): Future[Schedule] = Future {
     val msg = s"Retrieving schedule for $uuid succeeded, but it is not present"
     logFailure(schedulesFeature.retrieveSchedule(uuid),
+      msg
+    ) match {
+      case Some(result) => result
+      case None => throw new NoSuchElementException(msg)
+    }
+  }
+
+  override def retrieveDevices(): Future[List[Device]] = Future {
+    val msg = s"Retrieving devices for succeeded, but it is not present"
+    logFailure(devicesFeature.retrieveDevices(),
+      msg
+    ) match {
+      case Some(result) => result
+      case None => throw new NoSuchElementException(msg)
+    }
+  }
+
+  override def retrieveDevice(uuid: UUID): Future[Device] = Future {
+    val msg = s"Retrieving device ${uuid.toString} succeeded, but it is not present"
+    logFailure(deviceFeature.retrieveDevice(uuid),
+      msg
+    ) match {
+      case Some(result) => result
+      case None => throw new NoSuchElementException(msg)
+    }
+  }
+
+  override def updateDevice(dev: Device): Future[Device] = Future {
+    val msg = s"Updating device ${dev.id.toString} succeeded, but it is not present"
+    logFailure(deviceFeature.updateDevice(dev),
       msg
     ) match {
       case Some(result) => result
