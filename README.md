@@ -5,18 +5,20 @@
 An alternative for [mijn itho daalderop](https://mijn.ithodaalderop.nl/#/login), which in turn is an OEM version of [niko's Fifthplay](https://www.fifthplay.com/). 
 See [here](https://tweakers.net/productreview/212044/itho-daalderop-spider-connect.html) for a (dutch) discussion on why an alternative is useful. 
 
-## My usecase
-* A more meaningful portal that -- in one glance -- show's me all the information I'm interested in. 
-* An (easy) way to export data from the portal, so the data is not locked in the online environment. 
-* A more accessible platform by providing an API implementation for JVM languages such as Scala, Java or Kotlin. 
-* The payloads are very verbose, contain a lot of repetitive info and sometimes unused or in my view irrelevant info. 
-I'll drop these parts of the payload _unless_ there is a usecase for it. 
+## Getting started
 
-## Future work
-* Implement more of the API (compared to just what I personally need).
+### CLI Tool
+* Download the latest release
+* Setup your `application.conf` based on the [provided `reference.conf`](main/src/main/resources/reference.conf). Make sure to _at least_ set the credentials to the portal here.
+* Setup your logback configuration based on the [provided template](main/src/main/resources/logback.xml).
+* Run the tool: `java -Dconfig.file=application.conf -Dlogback.configurationFile=./logback.xml -jar ohti.jar`
+
+### API
+* Download the latest release
+* Use [the `api`](api/src/main/scala/nl/kevinvandervlist/ohti/api/PortalAPI.scala) like [the examples shown here](main/src/main/scala/nl/kevinvandervlist/ohti/main/Main.scala)
+* Make sure to setup `application.conf` in your client application
 
 ## Example usage
-
 ```
 $ java -Dconfig.file=application.conf -Dlogback.configurationFile=./logback.xml -jar ohti.jar help
 19:29:28.296 [main] ERROR nl.kevinvandervlist.ohti.main.Main$ - Available tasks are:
@@ -59,3 +61,14 @@ $ sqlite3 detailed-data.sqlite 'SELECT * from monitoring_data LIMIT 3;'
 70b4058a-0e98-4ecb-be3c-f52a6626944c|1588803300000|1588804200000|CentralMeterGasUsage|m3|0.0
 70b4058a-0e98-4ecb-be3c-f52a6626944c|1588804200000|1588805100000|CentralMeterGasUsage|m3|0.0
 ```
+
+## My usecase
+* A more meaningful portal that -- in one glance -- show's me all the information I'm interested in. 
+* An (easy) way to export data from the portal, so the data is not locked in the online environment. 
+* A more accessible platform by providing an API implementation for JVM languages such as Scala, Java or Kotlin. 
+* The payloads are very verbose, contain a lot of repetitive info and sometimes unused or in my view irrelevant info. 
+I'll drop these parts of the payload _unless_ there is a usecase for it. 
+
+## Future work
+* Publish the API part somewhere
+* Implement more of the API (compared to just what I personally need).
