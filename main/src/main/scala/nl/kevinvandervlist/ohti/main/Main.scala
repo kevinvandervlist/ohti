@@ -12,7 +12,9 @@ object Main extends App with LazyLogging {
     DailyAggregateSQLite.name -> DailyAggregateSQLite,
     CatchupDailyAggregateSQLite.name -> CatchupDailyAggregateSQLite,
     DetailedDataSQLite.name -> DetailedDataSQLite,
-    CatchupDetailedDataSQLite.name -> CatchupDetailedDataSQLite
+    CatchupDetailedDataSQLite.name -> CatchupDetailedDataSQLite,
+    EnableCoolingMode.name -> EnableCoolingMode,
+    DisableCoolingMode.name -> DisableCoolingMode
   )
 
   if(args.length == 0) {
