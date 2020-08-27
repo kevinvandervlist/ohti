@@ -3,8 +3,8 @@ javacOptions ++= Seq("-source", "1.11", "-target", "1.11", "-Xlint")
 lazy val commonSettings = Seq(
   organization := "nl.kevinvandervlist",
   name := "ohti",
-  version := "0.1.0-SNAPSHOT",
-  scalaVersion := "2.13.2",
+  version := "0.2.0",
+  scalaVersion := "2.13.3",
   scalacOptions ++= Seq(
     "-feature",
     // "-Werror", disabled for now
@@ -16,7 +16,7 @@ lazy val commonSettings = Seq(
   ),
   libraryDependencies ++= Seq(
     "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
-    "org.scalatest" %% "scalatest" % "3.1.2" % "test"
+    "org.scalatest" %% "scalatest" % "3.2.2" % "test"
   ),
   // Skip tests in assembly
   test in assembly := {},
@@ -27,9 +27,9 @@ lazy val api = (project in file("api")).
   settings(
     name := "api",
     libraryDependencies ++= Seq(
-      "com.softwaremill.sttp.client" %% "core" % "2.2.0",
-      "com.softwaremill.sttp.client" %% "circe" % "2.2.0",
-      "com.softwaremill.sttp.client" %% "slf4j-backend" % "2.2.0",
+      "com.softwaremill.sttp.client" %% "core" % "2.2.6",
+      "com.softwaremill.sttp.client" %% "circe" % "2.2.6",
+      "com.softwaremill.sttp.client" %% "slf4j-backend" % "2.2.6",
       "io.circe" %% "circe-optics" % "0.13.0"
     ),
   ).settings(
@@ -41,7 +41,7 @@ lazy val repositories = (project in file("repositories")).
   settings(
     name := "repositories",
     libraryDependencies ++= Seq(
-      "org.xerial" % "sqlite-jdbc" % "3.31.1"
+      "org.xerial" % "sqlite-jdbc" % "3.32.3.2"
     ),
   ).settings(
     assemblyJarName in assembly := "repositories.jar",
