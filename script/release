@@ -1,0 +1,15 @@
+#!/bin/bash -e
+
+cd "$(dirname "$0")"
+
+cd ..
+sbt dependencyUpdates
+
+echo "Make sure build.sbt and CHANGELOG.md are up to date. Then, press enter to continue"
+read
+VERSION=v$(grep version build.sbt | perl -pe 's/.*\"(.*)\",/\1/')
+./script/cibuild
+echo $VERSION
+
+git tag $VERSION
+git push origin $VERSION
