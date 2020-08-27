@@ -24,7 +24,7 @@ object DetailedDataSQLite extends RunnableTask with LazyLogging {
     val ids: Future[List[UUID]] = for {
       eds <- api.energyDevices()
       zs <- api.zones()
-    } yield eds.devices.map(_.id) ++ zs.map(_.id)
+    } yield eds.devices.map(_.energyDeviceId) ++ zs.map(_.id)
 
     // Take yesterdays data
     val yesterday = IthoZonedDateTime

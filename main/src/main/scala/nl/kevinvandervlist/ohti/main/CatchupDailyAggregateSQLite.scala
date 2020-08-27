@@ -19,10 +19,10 @@ object CatchupDailyAggregateSQLite extends RunnableTask with LazyLogging with Ca
     val aggCfg = settings.taskConfig(DailyAggregateSQLite.name)
     val cfg = settings.taskConfig(name)
     val devs = api.energyDevices().map(eds => Devices(
-      gas = eds.gasMeters.map(_.id),
-      consumed = eds.electricCentralMeterConsumption.map(_.id),
-      produced = eds.electricProduction.map(_.id),
-      feedback = eds.electricCentralMeterFeedback.map(_.id)
+      gas = eds.gasMeters.map(_.energyDeviceId),
+      consumed = eds.electricCentralMeterConsumption.map(_.energyDeviceId),
+      produced = eds.electricProduction.map(_.energyDeviceId),
+      feedback = eds.electricCentralMeterFeedback.map(_.energyDeviceId)
     ))
     val repo = PeriodicUsageRepository(aggCfg.getString("database"))
     val agg = devs.map(new PeriodicAggregateSQLite(repo, _))

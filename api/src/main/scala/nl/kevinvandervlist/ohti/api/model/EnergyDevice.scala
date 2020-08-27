@@ -11,7 +11,8 @@ case class EnergyDevice(id: UUID,
                         isOnline: Boolean,
                         isCentralMeter: Boolean,
                         isProducer: Boolean,
-                        meterValue: Option[BigDecimal])
+                        meterValue: Option[BigDecimal],
+                        energyDeviceId: UUID)
 object EnergyDevices {
   implicit def toList(container: EnergyDevices): List[EnergyDevice] = container.devices
   implicit def toContainer(list: List[EnergyDevice]): EnergyDevices = EnergyDevices(list)

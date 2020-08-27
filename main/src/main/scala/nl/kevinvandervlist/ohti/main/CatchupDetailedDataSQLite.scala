@@ -25,7 +25,7 @@ object CatchupDetailedDataSQLite extends RunnableTask with LazyLogging with Catc
     val _ids: Future[List[UUID]] = for {
       eds <- api.energyDevices()
       zs <- api.zones()
-    } yield eds.devices.map(_.id) ++ zs.map(_.id)
+    } yield eds.devices.map(_.energyDeviceId) ++ zs.map(_.id)
 
     val maxDuration = 10000 millis
     val ids = Await.result(_ids, maxDuration)

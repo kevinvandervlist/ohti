@@ -22,11 +22,12 @@ object EnergyDevices {
         isProducer <- c.downField("isProducer").as[Boolean]
         meterValue <- c.downField("meterIndexValue").as[Option[BigDecimal]]
         et <- c.downField("energyType").as[Int]
+        eid <- c.downField("energyDeviceId").as[String]
       } yield {
         // Note: I _think_ we are always in CET here
         val zdt = ots.map(IthoZonedDateTime.fromPortalString)
         val v = if(value.isNaN) { None } else { Some(BigDecimal(value)) }
-        EnergyDevice(UUID.fromString(id), name, v, zdt, asEnergyType(et), isOnline, isCentralMeter, isProducer, meterValue)
+        EnergyDevice(UUID.fromString(id), name, v, zdt, asEnergyType(et), isOnline, isCentralMeter, isProducer, meterValue, UUID.fromString(eid))
       }
   }
 

@@ -19,10 +19,10 @@ object DailyAggregateSQLite extends RunnableTask with LazyLogging {
   override def apply(api: PortalAPI, settings: Settings)(implicit ec: ExecutionContext): Unit = {
     val cfg = settings.taskConfig(name)
     val devs = api.energyDevices().map(eds => Devices(
-      gas = eds.gasMeters.map(_.id),
-      consumed = eds.electricCentralMeterConsumption.map(_.id),
-      produced = eds.electricProduction.map(_.id),
-      feedback = eds.electricCentralMeterFeedback.map(_.id)
+      gas = eds.gasMeters.map(_.energyDeviceId),
+      consumed = eds.electricCentralMeterConsumption.map(_.energyDeviceId),
+      produced = eds.electricProduction.map(_.energyDeviceId),
+      feedback = eds.electricCentralMeterFeedback.map(_.energyDeviceId)
     ))
     val repo = PeriodicUsageRepository(cfg.getString("database"))
     val agg = devs.map(new PeriodicAggregateSQLite(repo, _))
