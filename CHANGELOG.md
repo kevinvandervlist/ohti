@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2020-08-27
+* Energydevices now have distinct IDs (for identification) and energyDeviceIds (for measurement data)
+* Patch data analysis notebook -- UUIDs of devices in Fifthplay ecosystem suddenly changed
+
 ## [0.1.0] - 2020-06-16
 * Initial release
 * Extract data of monitoring devices
