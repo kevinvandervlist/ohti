@@ -3,7 +3,7 @@ javacOptions ++= Seq("-source", "1.11", "-target", "1.11", "-Xlint")
 lazy val commonSettings = Seq(
   organization := "nl.kevinvandervlist",
   name := "ohti",
-  version := "0.2.0",
+  version := "0.3.0-SNAPSHOT",
   scalaVersion := "2.13.3",
   scalacOptions ++= Seq(
     "-feature",
