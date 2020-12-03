@@ -4,7 +4,7 @@ import java.time.DayOfWeek
 import java.util.UUID
 
 import io.circe.{Decoder, Encoder, HCursor, Json}
-import nl.kevinvandervlist.ohti.api.model.{Moment, Schedule, ScheduledChoice, ScheduledDevice, ScheduledProperty}
+import nl.kevinvandervlist.ohti.api.model.{IthoZonedDateTime, Moment, Schedule, ScheduledChoice, ScheduledDevice, ScheduledProperty}
 import nl.kevinvandervlist.ohti.portal.TokenManager._
 import nl.kevinvandervlist.ohti.portal.Schedules._
 import sttp.client._
@@ -13,12 +13,42 @@ import sttp.client.circe._
 object Schedules {
   implicit val decodeSchedule: Decoder[Schedule] = new Decoder[Schedule] {
     final def apply(c: HCursor): Decoder.Result[Schedule] = for {
+      deviceType <- c.downField("deviceType").as[Int]
       scheduleId <- c.downField("scheduleId").as[String]
       scheduledDevices <- c.downField("scheduledDevices").as[List[ScheduledDevice]]
       props <- c.downField("scheduledProperties").as[List[ScheduledProperty]]
+      user <- c.downField("userId").as[String]
+      createdAt <- c.downField("createdAt").as[Long]
+      updatedAt <- c.downField("updatedAt").as[Long]
     } yield {
-      Schedule(UUID.fromString(scheduleId), scheduledDevices, props)
+      Schedule(
+        deviceType,
+        UUID.fromString(scheduleId),
+        scheduledDevices,
+        props,
+        user,
+        IthoZonedDateTime.fromTimeStamp(createdAt),
+        IthoZonedDateTime.fromTimeStamp(updatedAt)
+      )
     }
+  }
+
+  implicit val encodeSchedule: Encoder[Schedule] = new Encoder[Schedule] {
+    override def apply(s: Schedule): Json = Json.obj(
+      ("deviceType", Json.fromInt(s.deviceType)),
+      ("scheduleId", Json.fromString(s.id.toString)),
+      ("scheduleName", Json.fromString(s.id.toString)),
+      ("scheduledDevices", Json.arr(s.components.map(encodeScheduledDevice.apply): _*)),
+      ("scheduledProperties", Json.arr(s.properties.map(encodeScheduledProperty.apply): _*)),
+      ("createdBy", Json.fromString(s.user)),
+      ("updatedBy", Json.fromString(s.user)),
+      ("deletedBy", Json.Null),
+      ("userId", Json.fromString(s.user)),
+      ("createdAt", Json.fromLong(s.createdAt.asTimeStamp)),
+      ("updatedAt", Json.fromLong(s.createdAt.asTimeStamp)),
+      ("deletedAt", Json.fromInt(0)),
+      ("id", Json.fromString(s.id.toString))
+    )
   }
 
   implicit val decodeScheduledDevice: Decoder[ScheduledDevice] = new Decoder[ScheduledDevice] {
@@ -30,6 +60,13 @@ object Schedules {
     }
   }
 
+  implicit val encodeScheduledDevice: Encoder[ScheduledDevice] = new Encoder[ScheduledDevice] {
+    override def apply(s: ScheduledDevice): Json = Json.obj(
+      ("id", Json.fromString(s.id.toString)),
+      ("active", Json.fromBoolean(s.isActive))
+    )
+  }
+
   implicit val decodeScheduledProperties: Decoder[ScheduledProperty] = new Decoder[ScheduledProperty] {
     final def apply(c: HCursor): Decoder.Result[ScheduledProperty] = for {
       id <- c.downField("id").as[String]
@@ -37,6 +74,13 @@ object Schedules {
     } yield {
       ScheduledProperty(id, choices)
     }
+  }
+
+  implicit val encodeScheduledProperty: Encoder[ScheduledProperty] = new Encoder[ScheduledProperty] {
+    override def apply(s: ScheduledProperty): Json = Json.obj(
+      ("id", Json.fromString(s.id)),
+      ("scheduleChoices", Json.arr(s.choices.map(encodeScheduledChoice.apply): _*))
+    )
   }
 
   implicit val decodeScheduledChoice: Decoder[ScheduledChoice] = new Decoder[ScheduledChoice] {
@@ -113,5 +157,16 @@ class Schedules(private implicit val endpoint: Endpoint,
       .response(asJson[Schedule])
 
     doRequest("Failed to retrieve schedules, got code {} - {}", response)
+  }
+
+  def updateSchedule(schedule: nl.kevinvandervlist.ohti.api.model.Schedule): Option[nl.kevinvandervlist.ohti.api.model.Schedule] = {
+    val request = Util.authorizedRequest(tokenProvider)
+      .put(endpoint.schedule(schedule.id.toString))
+      .body(schedule)
+
+    val response = request
+      .response(asJson[nl.kevinvandervlist.ohti.api.model.Schedule])
+
+    doRequest("Failed to update schedule, got code {} - {}", response)
   }
 }

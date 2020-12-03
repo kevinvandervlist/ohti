@@ -107,21 +107,26 @@ private[api] class AsyncPortalAPI(username: String, password: String)
     ) getOrElse nl.kevinvandervlist.ohti.api.model.Zones(List.empty)
   }
 
-  override def schedule(uuid: UUID): Future[Schedule] = Future {
+  override def retrieveSchedule(uuid: UUID): Future[Schedule] = Future {
     val msg = s"Retrieving schedule for $uuid succeeded, but it is not present"
-    logFailure(schedulesFeature.retrieveSchedule(uuid),
-      msg
-    ) match {
+    logFailure(schedulesFeature.retrieveSchedule(uuid), msg) match {
       case Some(result) => result
       case None => throw new NoSuchElementException(msg)
     }
   }
 
+  override def updateSchedule(schedule: Schedule): Future[Schedule] = Future {
+    val msg = s"Updating schedule for ${schedule.id} succeeded, but it is not present"
+    logFailure(schedulesFeature.updateSchedule(schedule), msg) match {
+      case Some(result) => result
+      case None => throw new NoSuchElementException(msg)
+    }
+  }
+
+
   override def retrieveDevices(): Future[List[Device]] = Future {
     val msg = s"Retrieving devices for succeeded, but it is not present"
-    logFailure(devicesFeature.retrieveDevices(),
-      msg
-    ) match {
+    logFailure(devicesFeature.retrieveDevices(), msg) match {
       case Some(result) => result
       case None => throw new NoSuchElementException(msg)
     }
@@ -129,9 +134,7 @@ private[api] class AsyncPortalAPI(username: String, password: String)
 
   override def retrieveDevice(uuid: UUID): Future[Device] = Future {
     val msg = s"Retrieving device ${uuid.toString} succeeded, but it is not present"
-    logFailure(deviceFeature.retrieveDevice(uuid),
-      msg
-    ) match {
+    logFailure(deviceFeature.retrieveDevice(uuid), msg) match {
       case Some(result) => result
       case None => throw new NoSuchElementException(msg)
     }
@@ -139,9 +142,7 @@ private[api] class AsyncPortalAPI(username: String, password: String)
 
   override def updateDevice(dev: Device): Future[Device] = Future {
     val msg = s"Updating device ${dev.id.toString} succeeded, but it is not present"
-    logFailure(deviceFeature.updateDevice(dev),
-      msg
-    ) match {
+    logFailure(deviceFeature.updateDevice(dev), msg) match {
       case Some(result) => result
       case None => throw new NoSuchElementException(msg)
     }

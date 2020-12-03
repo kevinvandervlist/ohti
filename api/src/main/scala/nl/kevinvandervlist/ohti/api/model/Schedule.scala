@@ -3,7 +3,14 @@ package nl.kevinvandervlist.ohti.api.model
 import java.time.DayOfWeek
 import java.util.UUID
 
-case class Schedule(id: UUID, components: List[ScheduledDevice], properties: List[ScheduledProperty])
+case class Schedule(deviceType: Int,
+                    id: UUID,
+                    components: List[ScheduledDevice],
+                    properties: List[ScheduledProperty],
+                    user: String,
+                    createdAt: IthoZonedDateTime,
+                    updatedAt: IthoZonedDateTime
+                   )
 
 case class ScheduledDevice(id: UUID, isActive: Boolean)
 

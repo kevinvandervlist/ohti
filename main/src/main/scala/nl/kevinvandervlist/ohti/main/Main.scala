@@ -14,7 +14,9 @@ object Main extends App with LazyLogging {
     DetailedDataSQLite.name -> DetailedDataSQLite,
     CatchupDetailedDataSQLite.name -> CatchupDetailedDataSQLite,
     EnableCoolingMode.name -> EnableCoolingMode,
-    DisableCoolingMode.name -> DisableCoolingMode
+    DisableCoolingMode.name -> DisableCoolingMode,
+    EnableForcedHeatPumpMode.name -> EnableForcedHeatPumpMode,
+    DisableForcedHeatPumpMode.name -> DisableForcedHeatPumpMode,
   )
 
   if(args.length == 0) {
