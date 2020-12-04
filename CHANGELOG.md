@@ -1,6 +1,12 @@
 # Changelog
 
 ## [Unreleased]
+
+## [0.3.0] - 2020-12-04
+* Add two commands to configure specific schedules for the heating:
+  * one that (within certain temperature boundaries) "forces" the heatpump by assigning <2 consecutive hour time brackets
+  * One that just sets a simple schedule and therefore allowing gas usage
+  Note that in order to use this properly, you need to configure the settings of the Itho config panel on the CV/Heatpum unit itself properly as well. 
 * Fix issue where data was (implicitly) read as UTC, should by Europe/Amsterdam (as that's how it's supplied by the APIs)
 * Improve running totals notebook in order to show more info at a single glance
 

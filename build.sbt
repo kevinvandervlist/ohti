@@ -3,8 +3,8 @@ javacOptions ++= Seq("-source", "1.11", "-target", "1.11", "-Xlint")
 lazy val commonSettings = Seq(
   organization := "nl.kevinvandervlist",
   name := "ohti",
-  version := "0.3.0-SNAPSHOT",
-  scalaVersion := "2.13.3",
+  version := "0.3.0",
+  scalaVersion := "2.13.4",
   scalacOptions ++= Seq(
     "-feature",
     // "-Werror", disabled for now
@@ -16,7 +16,7 @@ lazy val commonSettings = Seq(
   ),
   libraryDependencies ++= Seq(
     "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
-    "org.scalatest" %% "scalatest" % "3.2.2" % "test"
+    "org.scalatest" %% "scalatest" % "3.2.3" % "test"
   ),
   // Skip tests in assembly
   test in assembly := {},
@@ -27,9 +27,9 @@ lazy val api = (project in file("api")).
   settings(
     name := "api",
     libraryDependencies ++= Seq(
-      "com.softwaremill.sttp.client" %% "core" % "2.2.6",
-      "com.softwaremill.sttp.client" %% "circe" % "2.2.6",
-      "com.softwaremill.sttp.client" %% "slf4j-backend" % "2.2.6",
+      "com.softwaremill.sttp.client" %% "core" % "2.2.9",
+      "com.softwaremill.sttp.client" %% "circe" % "2.2.9",
+      "com.softwaremill.sttp.client" %% "slf4j-backend" % "2.2.9",
       "io.circe" %% "circe-optics" % "0.13.0"
     ),
   ).settings(
@@ -53,7 +53,7 @@ lazy val main = (project in file("main")).
     name := "main",
     libraryDependencies ++= Seq(
       "ch.qos.logback" % "logback-classic" % "1.2.3",
-      "com.typesafe" % "config" % "1.4.0",
+      "com.typesafe" % "config" % "1.4.1",
     ),
   ).settings(
     mainClass in assembly := Some("nl.kevinvandervlist.ohti.main.Main"),
