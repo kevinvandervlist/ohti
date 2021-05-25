@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.com/kevinvandervlist/ohti.svg?token=kieE72RdKXcsawrKB9K3&branch=master)](https://travis-ci.com/kevinvandervlist/ohti)
 
 An alternative for [mijn itho daalderop](https://mijn.ithodaalderop.nl/#/login), which in turn is an OEM version of [niko's Fifthplay](https://www.fifthplay.com/). 
-See [here](https://tweakers.net/productreview/212044/itho-daalderop-spider-connect.html) for a (dutch) discussion on why an alternative is useful. 
+See [here](https://tweakers.net/productreview/212044/itho-daalderop-spider-connect.html) and [here](https://gathering.tweakers.net/forum/list_messages/1575932) for (Dutch) discussions on why an alternative is useful. 
 
 ## Getting started
 
