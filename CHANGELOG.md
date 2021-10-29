@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ## [0.4.0] - 2021-10-29
+* Update the reference config to reflect the new API endpoint
 * Move from sttp 2 -> sttp 3
 * Upgrade remaining dependencies
 
