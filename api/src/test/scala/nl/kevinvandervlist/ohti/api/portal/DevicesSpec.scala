@@ -7,8 +7,8 @@ import nl.kevinvandervlist.ohti.portal.TokenManager._
 import nl.kevinvandervlist.ohti.portal.{Devices, Endpoint}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import sttp.client.Response
-import sttp.client.testing.SttpBackendStub
+import sttp.client3.Response
+import sttp.client3.testing.SttpBackendStub
 import sttp.model.Method
 
 class DevicesSpec extends AnyWordSpec with Matchers {

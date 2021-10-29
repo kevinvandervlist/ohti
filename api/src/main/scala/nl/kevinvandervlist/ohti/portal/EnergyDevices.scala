@@ -6,8 +6,8 @@ import io.circe.{Decoder, HCursor}
 import nl.kevinvandervlist.ohti.api.model.{Electricity, EnergyDevice, EnergyType, Gas, IthoZonedDateTime}
 import nl.kevinvandervlist.ohti.portal.EnergyDevices._
 import nl.kevinvandervlist.ohti.portal.TokenManager._
-import sttp.client._
-import sttp.client.circe._
+import sttp.client3._
+import sttp.client3.circe._
 
 object EnergyDevices {
   implicit val decodeEnergyDevice: Decoder[EnergyDevice] = new Decoder[EnergyDevice] {
@@ -40,7 +40,7 @@ object EnergyDevices {
 
 class EnergyDevices(private implicit val endpoint: Endpoint,
                     private implicit val tokenProvider: TokenProvider,
-                    protected implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends Client[nl.kevinvandervlist.ohti.api.model.EnergyDevices] {
+                    protected implicit val backend: SttpBackend[Identity, Any]) extends Client[nl.kevinvandervlist.ohti.api.model.EnergyDevices] {
 
   def retrieveDevices(): Option[nl.kevinvandervlist.ohti.api.model.EnergyDevices] = {
     val request = Util.authorizedRequest(tokenProvider)

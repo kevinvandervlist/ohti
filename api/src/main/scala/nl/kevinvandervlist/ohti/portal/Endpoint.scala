@@ -1,7 +1,7 @@
 package nl.kevinvandervlist.ohti.portal
 
 import sttp.model.Uri
-import sttp.client.UriContext
+import sttp.client3.UriContext
 
 case class Endpoint(private val baseURL: String) {
   def tokens: Uri = uri"$baseURL/api/tokens"

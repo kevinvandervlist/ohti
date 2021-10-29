@@ -4,10 +4,10 @@ import java.time.temporal.ChronoUnit
 import java.util.UUID
 import java.util.concurrent.{Executors, ScheduledExecutorService}
 
-import sttp.client.logging.slf4j._
+import sttp.client3.logging.slf4j._
 import nl.kevinvandervlist.ohti.api.model._
 import nl.kevinvandervlist.ohti.portal.Endpoint
-import sttp.client.{HttpURLConnectionBackend, Identity, NothingT, SttpBackend}
+import sttp.client3.{HttpURLConnectionBackend, Identity, SttpBackend}
 
 import scala.concurrent.Future
 
@@ -15,10 +15,10 @@ object PortalAPI {
   def apply(baseURL: String, username: String, password: String, debug: Boolean = false): PortalAPI = {
     implicit val endpoint: Endpoint = Endpoint(baseURL)
     implicit val pool: ScheduledExecutorService = Executors.newScheduledThreadPool(8)
-    implicit val backend: SttpBackend[Identity, Nothing, NothingT] = HttpURLConnectionBackend()
+    implicit val backend: SttpBackend[Identity, Any] = HttpURLConnectionBackend()
 
     if(debug) {
-      new AsyncPortalAPI(username, password)(endpoint, pool, Slf4jCurlBackend[Identity, Nothing, NothingT](backend))
+      new AsyncPortalAPI(username, password)(endpoint, pool, Slf4jLoggingBackend[Identity, Any](backend))
     } else {
       new AsyncPortalAPI(username, password)
     }

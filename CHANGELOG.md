@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.4.0] - 2021-10-29
+* Move from sttp 2 -> sttp 3
+* Upgrade remaining dependencies
+
 ## [0.3.0] - 2020-12-04
 * Add two commands to configure specific schedules for the heating:
   * one that (within certain temperature boundaries) "forces" the heatpump by assigning <2 consecutive hour time brackets

@@ -15,8 +15,8 @@ lazy val commonSettings = Seq(
     "-Xlint:deprecation"
   ),
   libraryDependencies ++= Seq(
-    "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
-    "org.scalatest" %% "scalatest" % "3.2.3" % "test"
+    "com.typesafe.scala-logging" %% "scala-logging" % "3.9.4",
+    "org.scalatest" %% "scalatest" % "3.2.10" % "test"
   ),
   // Skip tests in assembly
   test in assembly := {},
@@ -27,10 +27,10 @@ lazy val api = (project in file("api")).
   settings(
     name := "api",
     libraryDependencies ++= Seq(
-      "com.softwaremill.sttp.client" %% "core" % "2.2.9",
-      "com.softwaremill.sttp.client" %% "circe" % "2.2.9",
-      "com.softwaremill.sttp.client" %% "slf4j-backend" % "2.2.9",
-      "io.circe" %% "circe-optics" % "0.13.0"
+      "com.softwaremill.sttp.client3" %% "core" % "3.3.16",
+      "com.softwaremill.sttp.client3" %% "circe" % "3.3.16",
+      "com.softwaremill.sttp.client3" %% "slf4j-backend" % "3.3.16",
+      "io.circe" %% "circe-optics" % "0.14.1"
     ),
   ).settings(
     assemblyJarName in assembly := "api.jar",
@@ -41,7 +41,7 @@ lazy val repositories = (project in file("repositories")).
   settings(
     name := "repositories",
     libraryDependencies ++= Seq(
-      "org.xerial" % "sqlite-jdbc" % "3.32.3.2"
+      "org.xerial" % "sqlite-jdbc" % "3.36.0.3"
     ),
   ).settings(
     assemblyJarName in assembly := "repositories.jar",
@@ -52,7 +52,7 @@ lazy val main = (project in file("main")).
   settings(
     name := "main",
     libraryDependencies ++= Seq(
-      "ch.qos.logback" % "logback-classic" % "1.2.3",
+      "ch.qos.logback" % "logback-classic" % "1.2.6",
       "com.typesafe" % "config" % "1.4.1",
     ),
   ).settings(

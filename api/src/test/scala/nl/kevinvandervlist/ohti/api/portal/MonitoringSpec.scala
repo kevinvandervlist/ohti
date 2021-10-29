@@ -7,8 +7,8 @@ import nl.kevinvandervlist.ohti.portal.{Endpoint, Monitoring}
 import nl.kevinvandervlist.ohti.portal.TokenManager._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import sttp.client.{Identity, Response}
-import sttp.client.testing.SttpBackendStub
+import sttp.client3.{Identity, Response}
+import sttp.client3.testing.SttpBackendStub
 import sttp.model.Method
 
 class MonitoringSpec extends AnyWordSpec with Matchers {
@@ -37,7 +37,7 @@ class MonitoringSpec extends AnyWordSpec with Matchers {
         |    "notifyChannel":"11.45fba720-c04a-4b6c-a471-e9a5d5c0d3c4.10.bin"
         |  }
         |]""".stripMargin
-    implicit val testingBackend: SttpBackendStub[Identity, Nothing, Nothing] = backend(response)
+    implicit val testingBackend: SttpBackendStub[Identity, Any] = backend(response)
     "be retrieved when a token is present" in {
       implicit val tokenProvider: TokenProvider = () => Some(TokenResponse("access", "type", 10, "refresh"))
       val monitoring = new Monitoring().retrieveMonitoringData(1440, UUID.fromString("5fba720-c04a-4b6c-a471-e9a5d5c0d3c4"), 2, IthoZonedDateTime.fromTimeStamp(1583054800000L))
@@ -108,7 +108,7 @@ class MonitoringSpec extends AnyWordSpec with Matchers {
         |    "notifyChannel":"80.ff0819b2-4a8e-47be-a0ae-78a86280948a.50.bin"
         |  }
         |]""".stripMargin
-    implicit val testingBackend: SttpBackendStub[Identity, Nothing, Nothing] = backend(response)
+    implicit val testingBackend: SttpBackendStub[Identity, Any] = backend(response)
     "be retrieved when a token is present" in {
       implicit val tokenProvider: TokenProvider = () => Some(TokenResponse("access", "type", 10, "refresh"))
       val monitoring = new Monitoring().retrieveMonitoringData(15, UUID.fromString("ff0819b2-4a8e-47be-a0ae-78a86280948a"), 2, IthoZonedDateTime.fromTimeStamp(1588012300000L))

@@ -1,15 +1,14 @@
 package nl.kevinvandervlist.ohti.portal
 
 import java.util.UUID
-
 import io.circe.{ACursor, Decoder, Encoder, HCursor, Json}
 import nl.kevinvandervlist.ohti.api.model
 import nl.kevinvandervlist.ohti.api.model.{DeviceProperty, ScheduledChoice}
 import nl.kevinvandervlist.ohti.portal.TokenManager._
 import nl.kevinvandervlist.ohti.portal.Schedules._
 import nl.kevinvandervlist.ohti.portal.Devices._
-import sttp.client._
-import sttp.client.circe._
+import sttp.client3._
+import sttp.client3.circe._
 
 object Devices {
   implicit val decodeDevice: Decoder[nl.kevinvandervlist.ohti.api.model.Device] = new Decoder[nl.kevinvandervlist.ohti.api.model.Device] {
@@ -160,7 +159,7 @@ object Devices {
 
 class Devices(private implicit val endpoint: Endpoint,
               private implicit val tokenProvider: TokenProvider,
-              protected implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends Client[List[nl.kevinvandervlist.ohti.api.model.Device]] {
+              protected implicit val backend: SttpBackend[Identity, Any]) extends Client[List[nl.kevinvandervlist.ohti.api.model.Device]] {
 
   def retrieveDevices(): Option[List[nl.kevinvandervlist.ohti.api.model.Device]] = {
     val request = Util.authorizedRequest(tokenProvider)
@@ -175,7 +174,7 @@ class Devices(private implicit val endpoint: Endpoint,
 
 class Device(private implicit val endpoint: Endpoint,
               private implicit val tokenProvider: TokenProvider,
-              protected implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends Client[nl.kevinvandervlist.ohti.api.model.Device] {
+              protected implicit val backend: SttpBackend[Identity, Any]) extends Client[nl.kevinvandervlist.ohti.api.model.Device] {
 
   def retrieveDevice(id: UUID): Option[nl.kevinvandervlist.ohti.api.model.Device] = {
     val request = Util.authorizedRequest(tokenProvider)

@@ -4,8 +4,8 @@ import com.typesafe.scalalogging.LazyLogging
 import io.circe
 import io.circe.{Decoder, Encoder, HCursor, Json}
 import nl.kevinvandervlist.ohti.portal.TokenManager._
-import sttp.client._
-import sttp.client.circe._
+import sttp.client3._
+import sttp.client3.circe._
 
 object TokenManager {
   case class TokenResponse(access_token: String, token_type: String, expires_in: Int, refresh_token: String)
@@ -34,7 +34,7 @@ object TokenManager {
 }
 
 class TokenManager(private implicit val endpoint: Endpoint,
-                   private implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends LazyLogging {
+                   private implicit val backend: SttpBackend[Identity, Any]) extends LazyLogging {
 
   def refreshToken(previous: TokenResponse): Option[TokenResponse] = {
     val request = Util.baseRequest
@@ -61,11 +61,11 @@ class TokenManager(private implicit val endpoint: Endpoint,
 
     handleResponse("requestToken", request
       .response(asJson[TokenResponse])
-      .send()
+      .send(backend)
     )
   }
 
-  private def handleResponse(method: String, response: Identity[Response[Either[ResponseError[circe.Error], TokenResponse]]]): Option[TokenResponse] = {
+  private def handleResponse(method: String, response: Identity[Response[Either[ResponseException[String, circe.Error], TokenResponse]]]): Option[TokenResponse] = {
     if(response.code.isSuccess) {
       // TODO: this behaves differently under test & runtime...
       if(response.body.isInstanceOf[TokenResponse]) {

@@ -10,12 +10,12 @@ import java.util.concurrent.{ScheduledExecutorService, _}
 
 import com.typesafe.scalalogging.LazyLogging
 import nl.kevinvandervlist.ohti.portal.{Devices, Endpoint, EnergyDevices, Monitoring, Schedules, TokenManager, Zones}
-import sttp.client.{Identity, NothingT, SttpBackend}
+import sttp.client3.{Identity, SttpBackend}
 
 private[api] class AsyncPortalAPI(username: String, password: String)
                                  (implicit val endpoint: Endpoint,
                                   implicit val pool: ScheduledExecutorService,
-                                  implicit val backend: SttpBackend[Identity, Nothing, NothingT]
+                                  implicit val backend: SttpBackend[Identity, Any]
                                  ) extends PortalAPI with LazyLogging {
   private val tokenManager = new TokenManager()
 

@@ -6,8 +6,8 @@ import nl.kevinvandervlist.ohti.portal.{Endpoint, Schedules}
 import nl.kevinvandervlist.ohti.portal.TokenManager.{TokenProvider, TokenResponse}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import sttp.client.{Identity, Response}
-import sttp.client.testing.SttpBackendStub
+import sttp.client3.{Identity, Response}
+import sttp.client3.testing.SttpBackendStub
 import sttp.model.Method
 
 class SchedulesSpec extends AnyWordSpec with Matchers {
@@ -173,7 +173,7 @@ class SchedulesSpec extends AnyWordSpec with Matchers {
 
   "Schedules" should {
     "be retrieved when a token is present" in {
-      implicit val testingBackend: SttpBackendStub[Identity, Nothing, Nothing] = SttpBackendStub.synchronous
+      implicit val testingBackend: SttpBackendStub[Identity, Any] = SttpBackendStub.synchronous
         .whenRequestMatchesPartial {
           case r if r.method == Method.GET => Response.ok(simpleSchedule)
         }
@@ -183,7 +183,7 @@ class SchedulesSpec extends AnyWordSpec with Matchers {
       schedule.get.id shouldBe UUID.fromString("af4d7550-0d33-4065-b279-15dec7493976")
     }
     "encode/decode for a temp schedule" in {
-      implicit val testingBackend: SttpBackendStub[Identity, Nothing, Nothing] = SttpBackendStub.synchronous
+      implicit val testingBackend: SttpBackendStub[Identity, Any] = SttpBackendStub.synchronous
         .whenRequestMatchesPartial {
           case r if r.method == Method.GET => Response.ok(tempSchedule)
           case r if r.method == Method.PUT => Response.ok(tempSchedule.replaceAll(

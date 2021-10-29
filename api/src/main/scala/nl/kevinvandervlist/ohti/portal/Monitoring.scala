@@ -1,13 +1,12 @@
 package nl.kevinvandervlist.ohti.portal
 
 import java.util.UUID
-
 import io.circe.{Decoder, HCursor}
 import nl.kevinvandervlist.ohti.api.model._
 import nl.kevinvandervlist.ohti.portal.TokenManager._
 import nl.kevinvandervlist.ohti.portal.Monitoring._
-import sttp.client._
-import sttp.client.circe._
+import sttp.client3._
+import sttp.client3.circe._
 
 object Monitoring {
   implicit val decodeDataUnit: Decoder[DataUnit] = new Decoder[DataUnit] {
@@ -66,7 +65,7 @@ object Monitoring {
 
 class Monitoring(private implicit val endpoint: Endpoint,
                  private implicit val tokenProvider: TokenProvider,
-                 protected implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends Client[List[MonitoringData]] {
+                 protected implicit val backend: SttpBackend[Identity, Any]) extends Client[List[MonitoringData]] {
 
   def retrieveMonitoringData(interval: Int, uuid: UUID, measurementCount: Int, start: IthoZonedDateTime): Option[List[MonitoringData]] = {
     val request = Util.authorizedRequest(tokenProvider)

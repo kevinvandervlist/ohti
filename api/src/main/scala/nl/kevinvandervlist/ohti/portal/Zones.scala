@@ -6,8 +6,8 @@ import io.circe.{Decoder, HCursor}
 import nl.kevinvandervlist.ohti.api.model.{Fan, Thermostat, Zone, ZoneComponent, ZoneComponentType}
 import nl.kevinvandervlist.ohti.portal.Zones._
 import nl.kevinvandervlist.ohti.portal.TokenManager._
-import sttp.client._
-import sttp.client.circe._
+import sttp.client3._
+import sttp.client3.circe._
 
 object Zones {
   implicit val decodeZone: Decoder[Zone] = new Decoder[Zone] {
@@ -43,7 +43,7 @@ object Zones {
 
 class Zones(private implicit val endpoint: Endpoint,
             private implicit val tokenProvider: TokenProvider,
-            protected implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends Client[nl.kevinvandervlist.ohti.api.model.Zones] {
+            protected implicit val backend: SttpBackend[Identity, Any]) extends Client[nl.kevinvandervlist.ohti.api.model.Zones] {
 
   def retrieveZones(): Option[nl.kevinvandervlist.ohti.api.model.Zones] = {
     val request = Util.authorizedRequest(tokenProvider)

@@ -7,8 +7,8 @@ import io.circe.{Decoder, Encoder, HCursor, Json}
 import nl.kevinvandervlist.ohti.api.model.{IthoZonedDateTime, Moment, Schedule, ScheduledChoice, ScheduledDevice, ScheduledProperty}
 import nl.kevinvandervlist.ohti.portal.TokenManager._
 import nl.kevinvandervlist.ohti.portal.Schedules._
-import sttp.client._
-import sttp.client.circe._
+import sttp.client3._
+import sttp.client3.circe._
 
 object Schedules {
   implicit val decodeSchedule: Decoder[Schedule] = new Decoder[Schedule] {
@@ -147,7 +147,7 @@ object Schedules {
 
 class Schedules(private implicit val endpoint: Endpoint,
                 private implicit val tokenProvider: TokenProvider,
-                protected implicit val backend: SttpBackend[Identity, Nothing, NothingT]) extends Client[nl.kevinvandervlist.ohti.api.model.Schedule] {
+                protected implicit val backend: SttpBackend[Identity, Any]) extends Client[nl.kevinvandervlist.ohti.api.model.Schedule] {
 
   def retrieveSchedule(id: UUID): Option[nl.kevinvandervlist.ohti.api.model.Schedule] = {
     val request = Util.authorizedRequest(tokenProvider)
