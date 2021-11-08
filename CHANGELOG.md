@@ -1,6 +1,7 @@
 # Changelog
 
 ## [Unreleased]
+* Bugfix: incorrectly hardcoded endpoints instead of using the config value
 
 ## [0.4.0] - 2021-10-29
 * Update the reference config to reflect the new API endpoint
